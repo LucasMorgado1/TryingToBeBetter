@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public enum Combat { playerTurn, enemyTurn, secondEnemyTurn, thirdEnemyTurn}
 
@@ -9,7 +10,8 @@ public class turnbasedScript : MonoBehaviour
     private playerTurnBased _playerTurnBased;
     private Camera _camera;
     private Combat _combat = Combat.playerTurn;
-    
+    private TextMeshProUGUI tmpro;
+
     private Enemy _enemyScript;
     private player _player;
 
@@ -18,6 +20,11 @@ public class turnbasedScript : MonoBehaviour
     #region Getter & Setters
     public Enemy SetEnemyScript { set => _enemyScript = value; }
     #endregion
+
+    private void Awake()
+    {
+        tmpro = transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+    }
 
     private void Start()
     {
@@ -47,6 +54,7 @@ public class turnbasedScript : MonoBehaviour
     public void FirstPlayerAttack ()
     {
         Debug.Log("Sword Slash");
+
     }
 
     public void SecondPlayerAttack ()
@@ -58,9 +66,6 @@ public class turnbasedScript : MonoBehaviour
     {
         Debug.Log("Magic Spell");
     }
-
-
-
     public void CardButton()
     {
         Debug.Log("The player will use a card power");
