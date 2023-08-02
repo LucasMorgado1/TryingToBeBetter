@@ -7,15 +7,21 @@ public enum Combat { playerTurn, enemyTurn, secondEnemyTurn, thirdEnemyTurn}
 
 public class turnbasedScript : MonoBehaviour
 {
+    [Header("Player")]
     private playerTurnBased _playerTurnBased;
-    private Camera _camera;
-    private Combat _combat = Combat.playerTurn;
+    [SerializeField] private player _player;
+
+    [Header("Canvas")]
+    [SerializeField] private TextMeshProUGUI _turnbasedText;
     private TextMeshProUGUI tmpro;
 
-    private Enemy _enemyScript;
-    private player _player;
 
+    private Camera _camera;
+    private Combat _combat = Combat.playerTurn;
+    private Enemy _enemyScript;
     private Vector3 _velocity = Vector3.one;
+
+    [SerializeField] private TurnbasedData _enemySelectedByThePlayer;
 
     #region Getter & Setters
     public Enemy SetEnemyScript { set => _enemyScript = value; }
@@ -28,8 +34,7 @@ public class turnbasedScript : MonoBehaviour
 
     private void Start()
     {
-        _playerTurnBased = GameObject.Find("player").GetComponent<playerTurnBased>();
-        _player = _playerTurnBased.GetComponent<player>();
+        _playerTurnBased = _player.GetComponent<playerTurnBased>();
         _camera = Camera.main;
     }
 
@@ -53,22 +58,43 @@ public class turnbasedScript : MonoBehaviour
 
     public void FirstPlayerAttack ()
     {
-        Debug.Log("Sword Slash");
+        _turnbasedText.text = "Please select the target enemy!!";
+
+        if (_enemySelectedByThePlayer.enemyWasSelected)
+        {
+            if (RandomCriticalDamage() >= 1 && RandomCriticalDamage() <= 5)
+            {
+                Debug.Log("Critical");
+                _enemyScript.TakeDamage(_player.GetFirstAttackDamage * 2);
+                _turnbasedText.text = "Player used Sword Slash, causing a CRITICAL DAMAGE of " + (_player.GetFirstAttackDamage * 2);
+            }
+            else
+            {
+                _enemyScript.TakeDamage(_player.GetFirstAttackDamage);
+                _turnbasedText.text = "Player used Sword Slash, causing" + _player.GetFirstAttackDamage + " of damage!";
+            }
+        }
 
     }
 
     public void SecondPlayerAttack ()
     {
-        Debug.Log("Super Fist");
+        _turnbasedText.text = "Player used Super Fist, causing" + _player.GetSecondAttackDamage + " of damage!";
     }
 
     public void ThirdPlayerAttack()
     {
-        Debug.Log("Magic Spell");
+        _turnbasedText.text = "Player used Sword Slash, causing" + _player.GetThirdAttackDamage + " of damage!";
     }
-    public void CardButton()
+
+    public void EnemyTakeDamage ()
     {
-        Debug.Log("The player will use a card power");
+        
+    }
+
+    private int RandomCriticalDamage ()
+    {
+        return Random.Range(1, 21);
     }
 
     public void RunButton()

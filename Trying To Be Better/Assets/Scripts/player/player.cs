@@ -60,6 +60,13 @@ public class player : MonoBehaviour
     private Animator animator;
     #endregion
 
+    #region Attacks
+    [Header("Attacks Damage")]
+    private int _firstAttackDamage = 5;
+    private int _secondAttackDamage = 3;
+    private int _thirdAttackDamage = 1;
+    #endregion
+
     private SpriteRenderer spriteRenderer;
 
     #region Getters/Setters
@@ -74,6 +81,9 @@ public class player : MonoBehaviour
     public MovementState SetIdle() => mState = MovementState.Idle;
     public MovementState SetWalk() => mState = MovementState.Walking;
     public MovementState SetStop() => mState = MovementState.Stop;
+    public int GetFirstAttackDamage { get => _firstAttackDamage; }
+    public int GetSecondAttackDamage { get => _secondAttackDamage; }
+    public int GetThirdAttackDamage { get => _thirdAttackDamage; }
 
     public Rigidbody2D GetRigidbody => rb;
     #endregion

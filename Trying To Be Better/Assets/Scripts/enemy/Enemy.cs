@@ -5,23 +5,26 @@ using UnityEngine.EventSystems;
 
 public class Enemy : MouseHandler
 {
-    private int _life;
-    [SerializeField] private int _enemyLife;
+    [Header("Enemy Variables")]
+    [SerializeField] private int _life;
     [SerializeField] [Range(1, 3)] private int _enemyQuantity;
     private Animator _animator;
     private BoxCollider2D _collider;
 
-    private bool playerIsAttacking = false;
     private GameObject _enemyInstantiated1;
     private GameObject _enemyInstantiated2;
-    private int _numberofEnemiesSpawned = default;
-    private bool _enteredOnce = false;
 
+    private bool playerIsAttacking = false;
+    private bool _enteredOnce = false;
+    
+    private int _numberofEnemiesSpawned = default;
+
+    [SerializeField] private TurnbasedData _whoIsTheEnemySelected;
+
+    #region Getter/Setter
     public int GetEnemyQuantity { get => _enemyQuantity; }
     public bool SetPlayerIsAttacking { set => playerIsAttacking = value; }
-
-    public Transform player;
-    float dist;
+    #endregion
 
     private void Awake()
     {
@@ -67,12 +70,19 @@ public class Enemy : MouseHandler
 
     public void TakeDamage(int damage)
     {
+        Debug.Log("current life: " + _life + " and damage to be taken: " + damage);
         _life -= damage;
-        Debug.Log(_life);
 
         if (_life <= 0)
             Destroy(this.gameObject);
     }
+
+    public override void OnPointerClick(PointerEventData eventData)
+    {
+        _whoIsTheEnemySelected.enemySelected = this.gameObject;
+        _whoIsTheEnemySelected.enemyWasSelected = true;
+    }
+
     public override void OnPointerEnter(PointerEventData eventData)
     {
         if (this.gameObject.layer == 8)
