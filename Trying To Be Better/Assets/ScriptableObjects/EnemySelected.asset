@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: EnemySelected
   m_EditorClassIdentifier: 
   enemySelected: {fileID: 0}
+  enemyWasSelected: 1

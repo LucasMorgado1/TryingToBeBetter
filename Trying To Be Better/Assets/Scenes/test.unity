@@ -738,7 +738,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _player: {fileID: 769518921}
   _turnbasedText: {fileID: 645159275}
-  _enemySelectedByThePlayer: {fileID: 0}
 --- !u!1 &453224453
 GameObject:
   m_ObjectHideFlags: 0
@@ -4177,7 +4176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useTypeWriter: 1
-  startTypewriterMode: 3
+  startTypewriterMode: -1
   hideAppearancesOnSkip: 0
   triggerEventsOnSkip: 0
   resetTypingSpeedAtStartup: 1
@@ -4555,6 +4554,18 @@ MonoBehaviour:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 317114437}
+        m_TargetAssemblyTypeName: turnbasedScript, Assembly-CSharp
+        m_MethodName: Aaaaaaaaaaaa
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -5416,7 +5427,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _life: 10
   _enemyQuantity: 2
-  _whoIsTheEnemySelected: {fileID: 11400000, guid: 9a7294ba3bf4bde46a6368bbe604b057, type: 2}
+  _turnbasedScript: {fileID: 317114437}
 --- !u!61 &2031660242
 BoxCollider2D:
   m_ObjectHideFlags: 0

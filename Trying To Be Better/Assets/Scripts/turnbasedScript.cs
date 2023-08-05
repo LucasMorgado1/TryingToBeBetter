@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.EventSystems;
+using System.Net.Http.Headers;
 
 public enum Combat { playerTurn, enemyTurn, secondEnemyTurn, thirdEnemyTurn}
 
@@ -21,10 +23,11 @@ public class turnbasedScript : MonoBehaviour
     private Enemy _enemyScript;
     private Vector3 _velocity = Vector3.one;
 
-    [SerializeField] private TurnbasedData _enemySelectedByThePlayer;
+    private GameObject _enemySelectedByThePlayer;
 
     #region Getter & Setters
     public Enemy SetEnemyScript { set => _enemyScript = value; }
+    public GameObject SetEnemySelectedByThePlayer { set => _enemySelectedByThePlayer = value; }
     #endregion
 
     private void Awake()
@@ -56,28 +59,61 @@ public class turnbasedScript : MonoBehaviour
         }
     }
 
-    public void FirstPlayerAttack ()
+    private void SelectEnemyShowText()
     {
         _turnbasedText.text = "Please select the target enemy!!";
+    }
 
-        if (_enemySelectedByThePlayer.enemyWasSelected)
+    private bool EnemySelected ()
+    {
+        if (_enemySelectedByThePlayer != null)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public void ChoosedAttack (int i)
+    {
+        switch (i)
+        {
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void FirstPlayerAttack()
+    {
+        if (EnemySelected())
         {
             if (RandomCriticalDamage() >= 1 && RandomCriticalDamage() <= 5)
             {
                 Debug.Log("Critical");
-                _enemyScript.TakeDamage(_player.GetFirstAttackDamage * 2);
+                _enemySelectedByThePlayer.GetComponent<Enemy>().TakeDamage(_player.GetFirstAttackDamage * 2);
                 _turnbasedText.text = "Player used Sword Slash, causing a CRITICAL DAMAGE of " + (_player.GetFirstAttackDamage * 2);
             }
             else
             {
-                _enemyScript.TakeDamage(_player.GetFirstAttackDamage);
+                _enemySelectedByThePlayer.GetComponent<Enemy>().TakeDamage(_player.GetFirstAttackDamage);
                 _turnbasedText.text = "Player used Sword Slash, causing" + _player.GetFirstAttackDamage + " of damage!";
             }
         }
 
     }
 
-    public void SecondPlayerAttack ()
+    private void StoreAttack ()
+    {
+
+    }
+
+    public void SecondPlayerAttack()
     {
         _turnbasedText.text = "Player used Super Fist, causing" + _player.GetSecondAttackDamage + " of damage!";
     }
@@ -87,12 +123,12 @@ public class turnbasedScript : MonoBehaviour
         _turnbasedText.text = "Player used Sword Slash, causing" + _player.GetThirdAttackDamage + " of damage!";
     }
 
-    public void EnemyTakeDamage ()
+    public void EnemyTakeDamage()
     {
-        
+
     }
 
-    private int RandomCriticalDamage ()
+    private int RandomCriticalDamage()
     {
         return Random.Range(1, 21);
     }
@@ -103,10 +139,10 @@ public class turnbasedScript : MonoBehaviour
         _enemyScript.DestroySpawnedEnemy();
     }
 
-    public void ActivateTurnBased ()
+    public void ActivateTurnBased()
     {
         this.gameObject.SetActive(true);
-        transform.position = _player.gameObject.transform.position; 
+        transform.position = _player.gameObject.transform.position;
         _camera.orthographicSize = 3;
     }
 

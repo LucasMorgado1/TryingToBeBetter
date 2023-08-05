@@ -19,7 +19,7 @@ public class Enemy : MouseHandler
     
     private int _numberofEnemiesSpawned = default;
 
-    [SerializeField] private TurnbasedData _whoIsTheEnemySelected;
+    [SerializeField] private turnbasedScript _turnbasedScript;
 
     #region Getter/Setter
     public int GetEnemyQuantity { get => _enemyQuantity; }
@@ -79,8 +79,8 @@ public class Enemy : MouseHandler
 
     public override void OnPointerClick(PointerEventData eventData)
     {
-        _whoIsTheEnemySelected.enemySelected = this.gameObject;
-        _whoIsTheEnemySelected.enemyWasSelected = true;
+        if (this.gameObject.layer == 8)
+            _turnbasedScript.SetEnemySelectedByThePlayer = this.gameObject;
     }
 
     public override void OnPointerEnter(PointerEventData eventData)
