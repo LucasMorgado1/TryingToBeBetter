@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine.EventSystems;
 using System.Net.Http.Headers;
 
-public enum Combat { playerTurn, enemyTurn, secondEnemyTurn, thirdEnemyTurn}
+public enum Combat { playerTurn, enemyTurn}
 
 public class turnbasedScript : MonoBehaviour
 {
@@ -23,11 +23,11 @@ public class turnbasedScript : MonoBehaviour
     private Enemy _enemyScript;
     private Vector3 _velocity = Vector3.one;
 
-    private GameObject _enemySelectedByThePlayer;
+    //private GameObject _enemySelectedByThePlayer;
 
     #region Getter & Setters
     public Enemy SetEnemyScript { set => _enemyScript = value; }
-    public GameObject SetEnemySelectedByThePlayer { set => _enemySelectedByThePlayer = value; }
+    //public GameObject SetEnemySelectedByThePlayer { set => _enemySelectedByThePlayer = value; }
     #endregion
 
     private void Awake()
@@ -50,10 +50,6 @@ public class turnbasedScript : MonoBehaviour
             case Combat.enemyTurn:
                 this.transform.GetChild(1).gameObject.SetActive(false);
                 break;
-            case Combat.secondEnemyTurn:
-                break;
-            case Combat.thirdEnemyTurn:
-                break;
             default:
                 break;
         }
@@ -64,7 +60,7 @@ public class turnbasedScript : MonoBehaviour
         _turnbasedText.text = "Please select the target enemy!!";
     }
 
-    private bool EnemySelected ()
+    /*private bool EnemySelected ()
     {
         if (_enemySelectedByThePlayer != null)
         {
@@ -72,7 +68,7 @@ public class turnbasedScript : MonoBehaviour
         }
         else
             return false;
-    }
+    }*/
 
     public void ChoosedAttack (int i)
     {
@@ -88,49 +84,73 @@ public class turnbasedScript : MonoBehaviour
                 break;
         }
     }
-
+    #region Attacks Logic
     public void FirstPlayerAttack()
     {
-        if (EnemySelected())
+        if (RandomCriticalDamage() >= 1 && RandomCriticalDamage() <= 5)
         {
-            if (RandomCriticalDamage() >= 1 && RandomCriticalDamage() <= 5)
-            {
-                Debug.Log("Critical");
-                _enemySelectedByThePlayer.GetComponent<Enemy>().TakeDamage(_player.GetFirstAttackDamage * 2);
-                _turnbasedText.text = "Player used Sword Slash, causing a CRITICAL DAMAGE of " + (_player.GetFirstAttackDamage * 2);
-            }
-            else
-            {
-                _enemySelectedByThePlayer.GetComponent<Enemy>().TakeDamage(_player.GetFirstAttackDamage);
-                _turnbasedText.text = "Player used Sword Slash, causing" + _player.GetFirstAttackDamage + " of damage!";
-            }
+            Debug.Log("Critical");
+            _enemyScript.TakeDamage(_player.GetFirstAttackDamage * 2);
+            _turnbasedText.text = "Player used Sword Slash, causing a CRITICAL DAMAGE of " + (_player.GetFirstAttackDamage * 2);
+        }
+        else
+        {
+            _enemyScript.TakeDamage(_player.GetFirstAttackDamage);
+            _turnbasedText.text = "Player used Sword Slash, causing " + _player.GetFirstAttackDamage + " of damage!";
         }
 
-    }
-
-    private void StoreAttack ()
-    {
-
+        ObserveEnemyLife();
     }
 
     public void SecondPlayerAttack()
     {
-        _turnbasedText.text = "Player used Super Fist, causing" + _player.GetSecondAttackDamage + " of damage!";
+        if (RandomCriticalDamage() >= 1 && RandomCriticalDamage() <= 5)
+        {
+            Debug.Log("Critical");
+            _enemyScript.TakeDamage(_player.GetSecondAttackDamage * 2);
+            _turnbasedText.text = "Player used a Magic Spell, causing a CRITICAL DAMAGE of " + (_player.GetSecondAttackDamage * 2);
+        }
+        else
+        {
+            _enemyScript.TakeDamage(_player.GetFirstAttackDamage);
+            _turnbasedText.text = "Player used a Magic Spell, causing " + _player.GetSecondAttackDamage + " of damage!";
+        }
+
+        ObserveEnemyLife();
     }
 
     public void ThirdPlayerAttack()
     {
-        _turnbasedText.text = "Player used Sword Slash, causing" + _player.GetThirdAttackDamage + " of damage!";
-    }
+        if (RandomCriticalDamage() >= 1 && RandomCriticalDamage() <= 5)
+        {
+            Debug.Log("Critical");
+            _enemyScript.TakeDamage(_player.GetThirdAttackDamage * 2);
+            _turnbasedText.text = "Player used a Quick Fist, causing a CRITICAL DAMAGE of " + (_player.GetThirdAttackDamage * 2);
+        }
+        else
+        {
+            _enemyScript.TakeDamage(_player.GetFirstAttackDamage);
+            _turnbasedText.text = "Player used a Quick Fist, causing " + _player.GetThirdAttackDamage + " of damage!";
+        }
 
-    public void EnemyTakeDamage()
-    {
-
+        ObserveEnemyLife();
     }
 
     private int RandomCriticalDamage()
     {
         return Random.Range(1, 21);
+    }
+    #endregion
+
+    private void EndPlayerTurn ()
+    {
+        _combat = Combat.enemyTurn;
+    }
+
+    private void ObserveEnemyLife ()
+    {
+        if (_enemyScript.GetLife <= 0)
+            DisableTurnbasedCanvas();
     }
 
     public void RunButton()
