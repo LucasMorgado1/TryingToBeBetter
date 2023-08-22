@@ -24,6 +24,7 @@ public class Enemy : MouseHandler
     #region Getter/Setter
     public int GetEnemyQuantity { get => _enemyQuantity; }
     public bool SetPlayerIsAttacking { set => playerIsAttacking = value; }
+    public int GetLife { get => _life; }
     #endregion
 
     private void Awake()
@@ -34,7 +35,7 @@ public class Enemy : MouseHandler
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Player") && !_enteredOnce) //maybe change to Vector3.Distance <= 5.5
+        /*if (collision.CompareTag("Player") && !_enteredOnce) //maybe change to Vector3.Distance <= 5.5
         {
             _collider.offset = Vector3.zero;
             _collider.size = Vector3.one;
@@ -57,7 +58,7 @@ public class Enemy : MouseHandler
                 default:
                     break;
             }
-        }
+        }*/
     }
 
     public void DestroySpawnedEnemy ()
@@ -79,8 +80,8 @@ public class Enemy : MouseHandler
 
     public override void OnPointerClick(PointerEventData eventData)
     {
-        if (this.gameObject.layer == 8)
-            _turnbasedScript.SetEnemySelectedByThePlayer = this.gameObject;
+        //if (this.gameObject.layer == 8)
+        //    _turnbasedScript.SetEnemySelectedByThePlayer = this.gameObject;
     }
 
     public override void OnPointerEnter(PointerEventData eventData)
