@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 using System.Net.Http.Headers;
+using Unity.VisualScripting.Dependencies.Sqlite;
 
 public enum Combat { playerTurn, enemyTurn}
 
@@ -12,18 +13,21 @@ public class turnbasedScript : MonoBehaviour
     [Header("Player")]
     private playerTurnBased _playerTurnBased;
     [SerializeField] private player _player;
+    private bool _itsCritical = false;
 
     [Header("Canvas")]
     [SerializeField] private TextMeshProUGUI _turnbasedText;
     private TextMeshProUGUI tmpro;
+    [SerializeField] private GameObject _turnBasedCanvas;
 
+    [Header("Enemy")]
+    [SerializeField] private int enemyHeal = 4;
+    private Enemy _enemyScript;
+    private bool  _getRandomRoll = false;
 
     private Camera _camera;
     private Combat _combat = Combat.playerTurn;
-    private Enemy _enemyScript;
     private Vector3 _velocity = Vector3.one;
-
-    //private GameObject _enemySelectedByThePlayer;
 
     #region Getter & Setters
     public Enemy SetEnemyScript { set => _enemyScript = value; }
@@ -48,104 +52,152 @@ public class turnbasedScript : MonoBehaviour
             case Combat.playerTurn:
                 break;
             case Combat.enemyTurn:
-                this.transform.GetChild(1).gameObject.SetActive(false);
+                StartCoroutine(EnemyAttack());
+                _turnBasedCanvas.SetActive(false);
                 break;
             default:
                 break;
         }
+
+        Debug.Log("It's " + _combat + " turn.");
     }
 
-    private void SelectEnemyShowText()
+    #region Player Turn
+    public void GetPlayerAttack (int numberAttack)
     {
-        _turnbasedText.text = "Please select the target enemy!!";
-    }
-
-    /*private bool EnemySelected ()
-    {
-        if (_enemySelectedByThePlayer != null)
-        {
-            return true;
-        }
-        else
-            return false;
-    }*/
-
-    public void ChoosedAttack (int i)
-    {
-        switch (i)
+        int _attackDamage;
+        switch (numberAttack)
         {
             case 1:
+                _attackDamage = CriticalHit(_player.GetFirstAttackDamage);
+                StartCoroutine(PlayerAttack(_attackDamage));
+                _turnbasedText.text = "Player is using Sword Slash";
                 break;
             case 2:
+                _attackDamage = CriticalHit(_player.GetSecondAttackDamage);
+                StartCoroutine(PlayerAttack(_attackDamage));
+                _turnbasedText.text = "Player is using Magic Spell";
                 break;
             case 3:
+                _attackDamage = CriticalHit(_player.GetThirdAttackDamage);
+                StartCoroutine(PlayerAttack(_attackDamage));
+                _turnbasedText.text = "Player is using Quick Fist";
                 break;
             default:
                 break;
         }
     }
-    #region Attacks Logic
-    public void FirstPlayerAttack()
+
+    private int CriticalHit (int damage)
     {
-        if (RandomCriticalDamage() >= 1 && RandomCriticalDamage() <= 5)
+        int randomNumber = Random.Range(1, 21);
+
+        if (randomNumber <= 5 && randomNumber >= 1)
         {
-            Debug.Log("Critical");
-            _enemyScript.TakeDamage(_player.GetFirstAttackDamage * 2);
-            _turnbasedText.text = "Player used Sword Slash, causing a CRITICAL DAMAGE of " + (_player.GetFirstAttackDamage * 2);
+            _itsCritical = true;
+            return damage * 2;
         }
         else
         {
-            _enemyScript.TakeDamage(_player.GetFirstAttackDamage);
-            _turnbasedText.text = "Player used Sword Slash, causing " + _player.GetFirstAttackDamage + " of damage!";
+            _itsCritical = false;
+            return damage;
         }
-
-        ObserveEnemyLife();
     }
 
-    public void SecondPlayerAttack()
+    IEnumerator PlayerAttack (int damage)
     {
-        if (RandomCriticalDamage() >= 1 && RandomCriticalDamage() <= 5)
-        {
-            Debug.Log("Critical");
-            _enemyScript.TakeDamage(_player.GetSecondAttackDamage * 2);
-            _turnbasedText.text = "Player used a Magic Spell, causing a CRITICAL DAMAGE of " + (_player.GetSecondAttackDamage * 2);
-        }
+        yield return new WaitForSeconds(2.5f);
+
+        if (_itsCritical)
+            _turnbasedText.text = "IT'S A CRITICAL!! Player gave " + damage + " of damage!!!";
         else
-        {
-            _enemyScript.TakeDamage(_player.GetFirstAttackDamage);
-            _turnbasedText.text = "Player used a Magic Spell, causing " + _player.GetSecondAttackDamage + " of damage!";
-        }
+            _turnbasedText.text = "And gave " + damage + " of damage!";
+
+        _enemyScript.TakeDamage(damage);
 
         ObserveEnemyLife();
-    }
 
-    public void ThirdPlayerAttack()
-    {
-        if (RandomCriticalDamage() >= 1 && RandomCriticalDamage() <= 5)
-        {
-            Debug.Log("Critical");
-            _enemyScript.TakeDamage(_player.GetThirdAttackDamage * 2);
-            _turnbasedText.text = "Player used a Quick Fist, causing a CRITICAL DAMAGE of " + (_player.GetThirdAttackDamage * 2);
-        }
-        else
-        {
-            _enemyScript.TakeDamage(_player.GetFirstAttackDamage);
-            _turnbasedText.text = "Player used a Quick Fist, causing " + _player.GetThirdAttackDamage + " of damage!";
-        }
+        yield return new WaitForSeconds(3f);
 
-        ObserveEnemyLife();
-    }
+        _turnbasedText.text = "Now it's Enemy's turn!";
 
-    private int RandomCriticalDamage()
-    {
-        return Random.Range(1, 21);
+        yield return new WaitForSeconds(3f);
+
+        EndPlayerTurn();
     }
-    #endregion
 
     private void EndPlayerTurn ()
     {
         _combat = Combat.enemyTurn;
     }
+    #endregion
+
+    #region Enemy Turn
+    IEnumerator EnemyAttack ()
+    {
+        _turnbasedText.text = "The " + _enemyScript.gameObject.name + " will...";
+
+        yield return new WaitForSeconds(2f);
+
+        ChooseEnemyAttack();
+        
+        yield return new WaitForSeconds(3f);
+
+        //_turnbasedText.text = "Now it's Player's turn!";
+        EndEnemyTurn();
+    }
+
+    private void ChooseEnemyAttack()
+    {
+        int roll = RandomRoll(); 
+
+        if (_enemyScript.GetLife <= _enemyScript.GetLife / 2.5f)
+        {
+            if (roll >= 1 && roll <= 7)
+            {
+                _enemyScript.SetLife = _enemyScript.GetLife + enemyHeal;
+                _turnbasedText.text = "Heal in: " + enemyHeal + " of life";
+                EndEnemyTurn();
+                return;
+            }
+            else
+                return;
+        }
+        else //colocar uma condicao da vida do player, se tiver baixa o inimigo vai atacar
+        {
+            if (roll >= 1  && roll <= 16) //normal attack
+            {
+                _turnbasedText.text = "do a Normal Attack!!";
+                Debug.Log("normal attack");
+                _player.TakeDamage(_enemyScript.GetNormalDamage);
+                return;
+            }
+            else if (roll >= 17 && roll <= 20) //strong attack
+            {
+                _turnbasedText.text = "do a Strong Attack!!";
+                Debug.Log("strong attack");
+                _player.TakeDamage(_enemyScript.GetStrongDamage);
+                return;
+            }
+        }
+    }
+
+    private int RandomRoll ()
+    {
+        if (!_getRandomRoll)
+        {
+            int temp = Random.Range(1, 21);
+            _getRandomRoll = true;
+            return temp;
+        }
+        return 0;
+    }
+
+    private void EndEnemyTurn ()
+    {
+        _combat = Combat.playerTurn;
+    }
+    #endregion
 
     private void ObserveEnemyLife ()
     {

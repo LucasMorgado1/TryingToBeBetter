@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.InputSystem;
 
 
@@ -14,6 +15,7 @@ public class player : MonoBehaviour
     private PlayerControls _playerControls;
     private Rigidbody2D rb;
     private MovementState mState;
+    private SpriteRenderer spriteRenderer;
     #endregion
 
     #region Movement Variables
@@ -60,22 +62,21 @@ public class player : MonoBehaviour
     private Animator animator;
     #endregion
 
-    #region Attacks
+    #region Attacks && Health
     [Header("Attacks Damage")]
     private int _firstAttackDamage = 5;
     private int _secondAttackDamage = 3;
     private int _thirdAttackDamage = 1;
+    private int _life = 10;
     #endregion
-
-    private SpriteRenderer spriteRenderer;
 
     #region Getters/Setters
     public bool GetIdle => mState == MovementState.Idle;
     public bool GetWalk => mState == MovementState.Walking;
     public bool GetFacinRight => isFacingRight == true;
     public float SetMoveSpeed { set => moveSpeed = value; }
-    public float OriginalMoveSpeed { get => saveMoveSpeed ; private set => saveMoveSpeed = value; }
-    public float FrictionAmount { get => frictionAmout ;  set => frictionAmout = value; }
+    public float OriginalMoveSpeed { get => saveMoveSpeed; private set => saveMoveSpeed = value; }
+    public float FrictionAmount { get => frictionAmout; set => frictionAmout = value; }
     public float OriginalFrictionAmount { get => saveFrictionAmount; }
     public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
     public MovementState SetIdle() => mState = MovementState.Idle;
@@ -84,8 +85,9 @@ public class player : MonoBehaviour
     public int GetFirstAttackDamage { get => _firstAttackDamage; }
     public int GetSecondAttackDamage { get => _secondAttackDamage; }
     public int GetThirdAttackDamage { get => _thirdAttackDamage; }
-
     public Rigidbody2D GetRigidbody => rb;
+    public int GetLife { get => _life; }
+    public int SetLife { set => _life = value; }
     #endregion
 
     #region Unity Methods
@@ -165,7 +167,7 @@ public class player : MonoBehaviour
         _playerControls.Disable();
     }
 
-    public void InteractHandler (InputAction.CallbackContext ctx) 
+    public void InteractHandler(InputAction.CallbackContext ctx)
     {
         interacted = ctx.performed;
     }
@@ -262,4 +264,14 @@ public class player : MonoBehaviour
     }
 
     #endregion
+
+    #region Damage
+    public void TakeDamage (int damage)
+    {
+        _life -= damage;
+
+        if (_life <= 0)
+            Destroy(this.gameObject);
+    }
+    #endregion 
 }

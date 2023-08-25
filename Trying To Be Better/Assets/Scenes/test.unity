@@ -710,7 +710,7 @@ RectTransform:
   m_GameObject: {fileID: 317114432}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 90}
-  m_LocalScale: {x: 0.0055555557, y: 0.0055555557, z: 0.0055555557}
+  m_LocalScale: {x: 0.0055, y: 0.0056, z: 0.005}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1431559862}
@@ -721,7 +721,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 23.09, y: 0.56}
+  m_AnchoredPosition: {x: 23.09, y: 0.12}
   m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &317114437
@@ -738,6 +738,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _player: {fileID: 769518921}
   _turnbasedText: {fileID: 645159275}
+  _turnBasedCanvas: {fileID: 2030357849}
+  enemyHeal: 4
+  roll: 0
 --- !u!1 &453224453
 GameObject:
   m_ObjectHideFlags: 0
@@ -3640,12 +3643,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 317114437}
         m_TargetAssemblyTypeName: turnbasedScript, Assembly-CSharp
-        m_MethodName: SecondPlayerAttack
-        m_Mode: 1
+        m_MethodName: GetPlayerAttack
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 2
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -3771,19 +3774,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1462705049}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 317114437}
-        m_TargetAssemblyTypeName: turnbasedScript, Assembly-CSharp
-        m_MethodName: CardButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1462705049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4536,31 +4527,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 317114437}
         m_TargetAssemblyTypeName: turnbasedScript, Assembly-CSharp
-        m_MethodName: FirstPlayerAttack
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 292456244}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 317114437}
-        m_TargetAssemblyTypeName: turnbasedScript, Assembly-CSharp
-        m_MethodName: Aaaaaaaaaaaa
+        m_MethodName: GetPlayerAttack
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5105,12 +5072,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 317114437}
         m_TargetAssemblyTypeName: turnbasedScript, Assembly-CSharp
-        m_MethodName: ThirdPlayerAttack
-        m_Mode: 1
+        m_MethodName: GetPlayerAttack
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 3
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -5428,6 +5395,8 @@ MonoBehaviour:
   _life: 10
   _enemyQuantity: 2
   _turnbasedScript: {fileID: 317114437}
+  _normalDamage: 2
+  _strongDamage: 5
 --- !u!61 &2031660242
 BoxCollider2D:
   m_ObjectHideFlags: 0

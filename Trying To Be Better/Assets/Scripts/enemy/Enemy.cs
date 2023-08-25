@@ -8,6 +8,7 @@ public class Enemy : MouseHandler
     [Header("Enemy Variables")]
     [SerializeField] private int _life;
     [SerializeField] [Range(1, 3)] private int _enemyQuantity;
+    [SerializeField] private turnbasedScript _turnbasedScript;
     private Animator _animator;
     private BoxCollider2D _collider;
 
@@ -19,12 +20,17 @@ public class Enemy : MouseHandler
     
     private int _numberofEnemiesSpawned = default;
 
-    [SerializeField] private turnbasedScript _turnbasedScript;
+    [Header("Damage")]
+    [SerializeField] private int _normalDamage = 2;
+    [SerializeField] private int _strongDamage = 5;
 
     #region Getter/Setter
     public int GetEnemyQuantity { get => _enemyQuantity; }
     public bool SetPlayerIsAttacking { set => playerIsAttacking = value; }
     public int GetLife { get => _life; }
+    public int SetLife { set => _life = value; }
+    public int GetNormalDamage { get => _normalDamage; }
+    public int GetStrongDamage { get => _strongDamage; }
     #endregion
 
     private void Awake()
