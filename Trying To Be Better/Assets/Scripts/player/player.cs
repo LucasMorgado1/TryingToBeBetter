@@ -64,10 +64,9 @@ public class player : MonoBehaviour
 
     #region Attacks && Health
     [Header("Attacks Damage")]
-    private int _firstAttackDamage = 5;
-    private int _secondAttackDamage = 3;
-    private int _thirdAttackDamage = 1;
-    private int _life = 10;
+    private int _attackDamage = 1;
+    private int _life;
+    private int _totalLife = 10;
     #endregion
 
     #region Getters/Setters
@@ -82,12 +81,11 @@ public class player : MonoBehaviour
     public MovementState SetIdle() => mState = MovementState.Idle;
     public MovementState SetWalk() => mState = MovementState.Walking;
     public MovementState SetStop() => mState = MovementState.Stop;
-    public int GetFirstAttackDamage { get => _firstAttackDamage; }
-    public int GetSecondAttackDamage { get => _secondAttackDamage; }
-    public int GetThirdAttackDamage { get => _thirdAttackDamage; }
+    public int GetAttackDamge { get => _attackDamage; }
     public Rigidbody2D GetRigidbody => rb;
     public int GetLife { get => _life; }
     public int SetLife { set => _life = value; }
+    public int GetTotalLife {  get => _totalLife; }
     #endregion
 
     #region Unity Methods
@@ -99,6 +97,7 @@ public class player : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         var action = new InputAction();
         _playerControls.Player.Move.performed += ctx => moveDirection = ctx.ReadValue<float>();
+        _life = _totalLife;
     }
 
     private void Start()
@@ -266,12 +265,14 @@ public class player : MonoBehaviour
     #endregion
 
     #region Damage
-    public void TakeDamage (int damage)
+    public bool TakeDamage (int damage)
     {
         _life -= damage;
 
         if (_life <= 0)
-            Destroy(this.gameObject);
+            return true;
+        else
+            return false;
     }
     #endregion 
 }

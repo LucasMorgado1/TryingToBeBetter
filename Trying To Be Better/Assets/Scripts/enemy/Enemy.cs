@@ -19,6 +19,7 @@ public class Enemy : MouseHandler
     private bool _enteredOnce = false;
     
     private int _numberofEnemiesSpawned = default;
+    private int _totalLife = 10;
 
     [Header("Damage")]
     [SerializeField] private int _normalDamage = 2;
@@ -29,6 +30,7 @@ public class Enemy : MouseHandler
     public bool SetPlayerIsAttacking { set => playerIsAttacking = value; }
     public int GetLife { get => _life; }
     public int SetLife { set => _life = value; }
+    public int GetTotalLife { get => _totalLife; }
     public int GetNormalDamage { get => _normalDamage; }
     public int GetStrongDamage { get => _strongDamage; }
     #endregion
@@ -37,34 +39,7 @@ public class Enemy : MouseHandler
     {
         _animator = GetComponent<Animator>();
         _collider = GetComponent<BoxCollider2D>();
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        /*if (collision.CompareTag("Player") && !_enteredOnce) //maybe change to Vector3.Distance <= 5.5
-        {
-            _collider.offset = Vector3.zero;
-            _collider.size = Vector3.one;
-            _enteredOnce = true;
-            this.gameObject.layer = 8;
-
-            switch (_enemyQuantity)
-            {
-                case 1:
-                    break;
-                case 2:
-                    _enemyInstantiated1 = Instantiate(this.gameObject, new Vector3(this.transform.position.x, this.transform.position.y + 1.30f, 0), Quaternion.identity);
-                    _numberofEnemiesSpawned = 1;
-                    break;
-                case 3:
-                    _enemyInstantiated1 = Instantiate(this.gameObject, new Vector3(this.transform.position.x, this.transform.position.y + 1.30f, 0), Quaternion.identity);
-                    _enemyInstantiated2 = Instantiate(this.gameObject, new Vector3(this.transform.position.x + 1.30f, this.transform.position.y + 0.8f, 0), Quaternion.identity);
-                    _numberofEnemiesSpawned = 2;
-                    break;
-                default:
-                    break;
-            }
-        }*/
+        _life = _totalLife;
     }
 
     public void DestroySpawnedEnemy ()
@@ -75,13 +50,14 @@ public class Enemy : MouseHandler
 
     }
 
-    public void TakeDamage(int damage)
-    {
-        Debug.Log("current life: " + _life + " and damage to be taken: " + damage);
+    public bool TakeDamage(int damage)
+    { 
         _life -= damage;
 
         if (_life <= 0)
-            Destroy(this.gameObject);
+            return true;
+        else
+            return false;
     }
 
     public override void OnPointerClick(PointerEventData eventData)
