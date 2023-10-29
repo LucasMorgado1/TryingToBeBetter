@@ -22,8 +22,8 @@ public class Enemy : MouseHandler
     private int _totalLife = 10;
 
     [Header("Damage")]
-    [SerializeField] private int _normalDamage = 2;
-    [SerializeField] private int _strongDamage = 5;
+    [SerializeField] private int _normalDamage = default;
+    [SerializeField] private int _strongDamage = default;
 
     #region Getter/Setter
     public int GetEnemyQuantity { get => _enemyQuantity; }

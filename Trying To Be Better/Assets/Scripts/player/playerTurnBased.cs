@@ -33,8 +33,7 @@ public class playerTurnBased : MonoBehaviour
         if (collision.CompareTag("Enemy"))
         {
             _turnbasedScript.ActivateTurnBased();
-            _player.SetMoveSpeed = 0;
-            _player.FrictionAmount = 5;
+            _player.DisablePlayerMovement();
             _turnbasedScript.SetEnemyScript = collision.GetComponent<Enemy>();
         }
     }

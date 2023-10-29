@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.InputSystem;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 
 public class player : MonoBehaviour
@@ -32,12 +33,21 @@ public class player : MonoBehaviour
     private float saveMoveSpeed = 7;
     private float saveFrictionAmount = 0.55f;
 
+    [Header("Original Movement Values")]
+    
+    private float originalMoveSpeed = 7;
+    private float originalAcceleration = 12;
+    private float originalDecceleration = 16;
+    private float originalVelPower = 0.85f;
+    private float originalFrictionAmout = 0.55f;
+
     #endregion
 
     #region Jump Variables
 
     [Header("Jump")]
-    [SerializeField] private float jumpForce = 5f;  // Força inicial do pulo
+    [SerializeField] private float jumpForce;  // Força inicial do pulo
+    [SerializeField] private float originalJumpForce = 5f;
     public float fallMultiplier = 2.5f;    // Multiplicador de queda para controlar a velocidade de queda
     public float lowJumpMultiplier = 2f;   // Multiplicador de pulo baixo para controlar o arco do pulo
     [SerializeField] private int maxJumps = 2;  // Número máximo de pulos
@@ -63,10 +73,12 @@ public class player : MonoBehaviour
     #endregion
 
     #region Attacks && Health
+
     [Header("Attacks Damage")]
     private int _attackDamage = 1;
-    private int _life;
-    private int _totalLife = 10;
+    private int _currentHp;
+    [SerializeField] private int _totalHp = 10;
+
     #endregion
 
     #region Getters/Setters
@@ -83,9 +95,9 @@ public class player : MonoBehaviour
     public MovementState SetStop() => mState = MovementState.Stop;
     public int GetAttackDamge { get => _attackDamage; }
     public Rigidbody2D GetRigidbody => rb;
-    public int GetLife { get => _life; }
-    public int SetLife { set => _life = value; }
-    public int GetTotalLife {  get => _totalLife; }
+    public int GetLife { get => _currentHp; }
+    public int SetLife { set => _currentHp = value; }
+    public int GetTotalLife {  get => _totalHp; }
     #endregion
 
     #region Unity Methods
@@ -97,7 +109,8 @@ public class player : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         var action = new InputAction();
         _playerControls.Player.Move.performed += ctx => moveDirection = ctx.ReadValue<float>();
-        _life = _totalLife;
+        _currentHp = _totalHp;
+        jumpForce = originalJumpForce;
     }
 
     private void Start()
@@ -264,15 +277,40 @@ public class player : MonoBehaviour
 
     #endregion
 
-    #region Damage
+    #region Damage/Heal
     public bool TakeDamage (int damage)
     {
-        _life -= damage;
+        _currentHp -= damage;
 
-        if (_life <= 0)
+        if (_currentHp <= 0)
             return true;
         else
             return false;
     }
+
+    public void HealHP (int amount)
+    {
+        _currentHp += amount;
+
+        if (_currentHp > _totalHp)
+        {
+            _currentHp = _totalHp;
+        }
+    }
+
     #endregion 
+
+    public void DisablePlayerMovement ()
+    {
+        SetMoveSpeed = 0;
+        FrictionAmount = 5;
+        jumpForce = 0;
+    }
+
+    public void EnablePlayerMovement()
+    {
+        SetMoveSpeed = originalMoveSpeed;
+        frictionAmout = originalFrictionAmout;
+        jumpForce = originalJumpForce;
+    }
 }

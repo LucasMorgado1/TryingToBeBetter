@@ -7,6 +7,11 @@ public enum BattleState { Start, PreparingPlayer, PlayerTurn, EnemyTurn, Won, Lo
 
 public class turnbasedScript : MonoBehaviour
 {
+    [Header("References")]
+    private Camera _camera;
+    [SerializeField] private EnemiesManager _enemiesManager;
+    [SerializeField] private Checkpoint _checkpoint;
+
     [Header("Prefabs")]
     [SerializeField] private GameObject _playerPrefab;
     [SerializeField] private GameObject _enemyPrefab;
@@ -35,10 +40,8 @@ public class turnbasedScript : MonoBehaviour
     private Enemy _enemy;
     private bool  _getRandomRoll = false;
 
-    private Camera _camera;
     private BattleState _state = BattleState.PlayerTurn;
     private Vector3 _velocity = Vector3.one;
-    private Timer _timer;
 
     #region Getter & Setters
     public Enemy SetEnemyScript { set => _enemy = value; }
@@ -54,8 +57,6 @@ public class turnbasedScript : MonoBehaviour
     {
         _state = BattleState.Start;
         _camera = Camera.main;
-        _timer = new Timer();
-        _timer.duration = 3.0f;
         _attackUI = this.gameObject.transform.GetChild(2).transform.GetChild(0).gameObject;
         _lifeUI = this.gameObject.transform.GetChild(2).transform.GetChild(1).gameObject;
         _lifeUI.SetActive(false);
@@ -76,6 +77,8 @@ public class turnbasedScript : MonoBehaviour
 
         _state = BattleState.PlayerTurn;
         _lifeUI.SetActive(true);
+        UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
+        UpdateLifeUI(_enemyLife, _enemy.GetLife, _enemy.GetTotalLife);
         PlayerTurn();
 
     }
@@ -94,21 +97,30 @@ public class turnbasedScript : MonoBehaviour
         StartCoroutine(PlayerAttack());
     }
 
+    public void OnHealButton ()
+    {
+        if (_state != BattleState.PlayerTurn)
+            return;
+
+        StartCoroutine(HealPlayer());
+    }
+
     IEnumerator PlayerAttack ()
     {
+        bool isDead;
+
         if (RollDice() <= 8)
         {
             //damage the enemy
-            bool isDead = _enemy.TakeDamage(_player.GetAttackDamge);
+            isDead = _enemy.TakeDamage(_player.GetAttackDamge);
             UpdateLifeUI(_enemyLife, _enemy.GetLife, _enemy.GetTotalLife);
             _dialogueText.text = "The attack is succesful!!";
         }
         else
         {
             _dialogueText.text = "The attack has missed the enemy!!";
+            isDead = false;
         }
-
-
 
         yield return new WaitForSeconds(2.5f);
 
@@ -116,7 +128,7 @@ public class turnbasedScript : MonoBehaviour
         if (isDead)
         {
             _state = BattleState.Won;
-            EndBattle();
+            StartCoroutine(EndBattle());
         } 
         else
         {
@@ -126,19 +138,52 @@ public class turnbasedScript : MonoBehaviour
         }
     }
 
+    IEnumerator HealPlayer ()
+    {
+        _player.HealHP(3);
+        UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
+        _dialogueText.text = "After driking some refreshing juice, you feel new again!!";
+
+        yield return new WaitForSeconds(2f);
+
+        _state = BattleState.EnemyTurn;
+        _attackUI.SetActive(false);
+        StartCoroutine(EnemyAttack());
+    }
+
     IEnumerator EnemyAttack ()
     {
+        bool isDead;
         _dialogueText.text = _enemy.name + " attacks...";
 
         yield return new WaitForSeconds(2.5f);
 
-        bool isDead = _player.TakeDamage(ChooseEnemyAttack());
-        UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
+
+        if (RollDice() >= 1 && RollDice() <= 7)
+        {
+            isDead = _player.TakeDamage(_enemy.GetNormalDamage);
+            UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
+            _dialogueText.text = _enemy.name + " attacks, causing " + _enemy.GetNormalDamage + " of damage";
+        }
+        else if (RollDice() >= 8 && RollDice() <= 9)
+        {
+            isDead = _player.TakeDamage(_enemy.GetStrongDamage);
+            UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
+            _dialogueText.text = _enemy.name + " attacks, causing " + _enemy.GetStrongDamage + " of damage";
+        }
+        else
+        {
+            isDead = false;
+            UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
+            _dialogueText.text = "Enemy missed his attack!!";
+        }
+
+        yield return new WaitForSeconds(2.5f);
 
         if (isDead)
         {
             _state = BattleState.Lost;
-            EndBattle();
+            StartCoroutine(EndBattle());
         } 
         else
         {
@@ -149,24 +194,7 @@ public class turnbasedScript : MonoBehaviour
 
     }
 
-    private int ChooseEnemyAttack()
-    {
-        int roll = Random.Range(1, 21);
-
-        if (roll >= 1 && roll <= 12) //normal attack
-        {
-            return 3;
-        } 
-        else if (roll >= 13 && roll <= 20)
-        {
-            return 6;
-        }
-
-        return 0;
-    }
-
-
-    private void EndBattle ()
+    IEnumerator EndBattle ()
     {
         if (_state == BattleState.Won)
         {
@@ -177,8 +205,15 @@ public class turnbasedScript : MonoBehaviour
         {
             _dialogueText.text = "You were defeated..."; //this scares me
             _lifeUI.SetActive(false);
+
+            yield return new WaitForSeconds(2.5f);
+
+            _player.EnablePlayerMovement();
+            _checkpoint.ReturnToCheckpoint();
+            _enemiesManager.EnableAllEnemies();
+            _camera.orthographicSize = 5;
         }
-        return;
+        yield return null;
     }
 
     private void UpdateLifeUI (TextMeshProUGUI lifeTxt, int currentLife, int totalLife)
@@ -191,220 +226,6 @@ public class turnbasedScript : MonoBehaviour
         return Random.Range(1, 11);
     }
 
-
-
-    /*#region Player Turn
-    public void GetPlayerAttack (int numberAttack)
-    {
-        switch (numberAttack)
-        {
-            case 1:
-                Attack(_player.GetFirstAttackDamage, "Sword Slash");
-                ObserveEnemyLife();
-                EndPlayerTurn();
-                break;
-            case 2:
-                Attack(_player.GetSecondAttackDamage, "Magic Spell");
-                ObserveEnemyLife();
-                EndPlayerTurn();
-                break;
-            case 3:
-                Attack(_player.GetThirdAttackDamage, "Quick Fist");
-                ObserveEnemyLife();
-                EndPlayerTurn();
-                break;
-        }
-    }
-
-    public void StartPlayerAttack (int numberAttack)
-    {
-        StartCoroutine(PlayerAttack(numberAttack));
-    }
-
-    private IEnumerator PlayerAttack (int numberAttack)
-    {
-        switch (numberAttack)
-        {
-            case 1:
-                //Attack(_player.GetFirstAttackDamage, "Sword Slash");
-                _dialogueText.text = "Player used Sword Slash and gave " + _player.GetFirstAttackDamage + " of damage.";
-                ObserveEnemyLife();
-                yield return new WaitForSeconds(2f);
-                EndPlayerTurn();
-                break;
-            case 2:
-                //Attack(_player.GetSecondAttackDamage, "Magic Spell");
-                _dialogueText.text = "Player used Magic Spell and gave " + _player.GetSecondAttackDamage + " of damage.";
-                ObserveEnemyLife();
-                yield return new WaitForSeconds(2f);
-                EndPlayerTurn();
-                break;
-            case 3:
-                //Attack(_player.GetThirdAttackDamage, "Quick Fist");
-                _dialogueText.text = "Player used Sword Slash and gave " + _player.GetFirstAttackDamage + " of damage.";
-                ObserveEnemyLife();
-                yield return new WaitForSeconds(2f);
-                EndPlayerTurn();
-                break;
-        }
-    }
-
-    private void Attack (int damage, string attackname)
-    {
-        int randomNumber = Random.Range(1, 21);
-
-        _itsCritical = randomNumber <= 5 && randomNumber >= 1 ?  true: false;
-
-        if (_itsCritical)
-        {
-            _enemy.TakeDamage(damage * 2);
-            //_turnbasedText.text = "Player used " + attackname + " and gave " + damage * 2 + " of damage.";
-        }
-        else
-        {
-            _enemy.TakeDamage(damage);
-            _dialogueText.text = "Player used " + attackname + " and gave " + damage + " of damage.";
-        }
-    }
-
-    private void EndPlayerTurn ()
-    {
-        _state = BattleState.EnemyTurn;
-        _dialogueText.text = "Now it's Enemy turn";
-    }
-    #endregion
-
-    #region Enemy Turn
-    IEnumerator EnemyAttack ()
-    {
-        int roll = RandomRoll();
-
-        if (_enemy.GetLife <= _enemy.GetLife / 2.5f)
-        {
-            if (roll >= 1 && roll <= 7)
-            {
-                _enemy.SetLife = _enemy.GetLife + enemyHeal;
-                _dialogueText.text = "Heal in: " + enemyHeal + " of life";
-                EndEnemyTurn();
-                yield return null;
-            }
-            else
-                yield return null; ;
-        }
-        else if (_player.GetLife <= _enemy.GetNormalDamage)
-        {
-            _player.TakeDamage(_enemy.GetNormalDamage);
-            yield return null; ;
-        }
-        else
-        {
-            if (roll >= 1 && roll <= 16) //normal attack
-            {
-                _dialogueText.text = "do a Normal Attack!!";
-                Debug.Log("normal attack");
-                _player.TakeDamage(_enemy.GetNormalDamage);
-                yield return null; ;
-            }
-            else if (roll >= 17 && roll <= 20) //strong attack
-            {
-                _dialogueText.text = "do a Strong Attack!!";
-                Debug.Log("strong attack");
-                _player.TakeDamage(_enemy.GetStrongDamage);
-                yield return null; ;
-            }
-        }
-
-        yield return new WaitForSeconds(3f);
-
-        EndEnemyTurn();
-    }
-
-    private void ChooseEnemyAttack()
-    {
-        int roll = RandomRoll();
-
-        if (_enemy.GetLife <= _enemy.GetLife / 2.5f)
-        {
-            if (roll >= 1 && roll <= 7)
-            {
-                _enemy.SetLife = _enemy.GetLife + enemyHeal;
-                _dialogueText.text = "Heal in: " + enemyHeal + " of life";
-                EndEnemyTurn();
-                return;
-            }
-            else
-                return;
-        }
-        else if (_player.GetLife <= _enemy.GetNormalDamage)
-        {
-            _player.TakeDamage(_enemy.GetNormalDamage);
-            return;
-        }
-        else
-        {
-            if (roll >= 1  && roll <= 16) //normal attack
-            {
-                _dialogueText.text = "do a Normal Attack!!";
-                Debug.Log("normal attack");
-                _player.TakeDamage(_enemy.GetNormalDamage);
-                return;
-            }
-            else if (roll >= 17 && roll <= 20) //strong attack
-            {
-                _dialogueText.text = "do a Strong Attack!!";
-                Debug.Log("strong attack");
-                _player.TakeDamage(_enemy.GetStrongDamage);
-                return;
-            }
-        }
-    }
-
-    private int RandomRoll ()
-    {
-        if (!_getRandomRoll)
-        {
-            int temp = Random.Range(1, 21);
-            _getRandomRoll = true;
-            return temp;
-        }
-        return 0;
-    }
-
-    private void EndEnemyTurn ()
-    {
-        _state = BattleState.PlayerTurn;
-        _dialogueText.text = "Now it's Player Turn";
-    }
-    #endregion
-
-    private void ObserveEnemyLife ()
-    {
-        if (_enemy.GetLife <= 0)
-        {
-            _dialogueText.text = "The Enemy has been defeated.";
-            DisableTurnbasedCanvas();
-        }
-    }
-
-    public void RunButton()
-    {
-        DisableTurnbasedCanvas();
-        _enemy.DestroySpawnedEnemy();
-    }
-
-    public void ActivateTurnBased()
-    {
-        this.gameObject.SetActive(true);
-        transform.position = _player.gameObject.transform.position;
-        _camera.orthographicSize = 3;
-    }
-
-    public void DisableTurnbasedCanvas()
-    {
-        this.gameObject.SetActive(false);
-        //essas medidas eventulamente irao para um game manager
-        _camera.orthographicSize = 5;
-    }*/
     public void ActivateTurnBased()
     {
         StartCoroutine(SetupBattle());
