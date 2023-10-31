@@ -7,8 +7,8 @@ public class playerTurnBased : MonoBehaviour
     private player _player;
     private int playerLife = 10;
 
-    private GameObject _turnbasedCanvas;
-    private turnbasedScript _turnbasedScript;
+    //private GameObject _turnbasedCanvas;
+    [SerializeField] private turnbasedScript _turnbasedScript;
 
     #region Getter & Setters
     public player GetPlayerScript { get => _player; }
@@ -20,12 +20,6 @@ public class playerTurnBased : MonoBehaviour
     private void Awake()
     {
         _player = GetComponent<player>();
-    }
-
-    private void Start()
-    {
-        _turnbasedCanvas = GameObject.Find("Turnbased Canvas");
-        _turnbasedScript = _turnbasedCanvas.GetComponent<turnbasedScript>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

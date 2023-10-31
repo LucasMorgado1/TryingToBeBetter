@@ -27,8 +27,7 @@ public class turnbasedScript : MonoBehaviour
     [Header("Canvas")]
     [SerializeField] private TextMeshProUGUI _dialogueText;
     [SerializeField] private GameObject _tbCanvas;
-    private TextMeshProUGUI tmpro; //excluir dps
-    private GameObject _attackUI;
+    private GameObject _attackCanvas;
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI _playerLife;
@@ -48,18 +47,16 @@ public class turnbasedScript : MonoBehaviour
     //public GameObject SetEnemySelectedByThePlayer { set => _enemySelectedByThePlayer = value; }
     #endregion
 
-    private void Awake()
-    {
-        tmpro = transform.GetChild(1).GetComponent<TextMeshProUGUI>();
-    }
-
     private void Start()
     {
         _state = BattleState.Start;
         _camera = Camera.main;
-        _attackUI = this.gameObject.transform.GetChild(2).transform.GetChild(0).gameObject;
+       
+        _attackCanvas = this.gameObject.transform.GetChild(2).transform.GetChild(0).gameObject;
         _lifeUI = this.gameObject.transform.GetChild(2).transform.GetChild(1).gameObject;
+        
         _lifeUI.SetActive(false);
+        _attackCanvas.SetActive(false);
     }
 
     IEnumerator SetupBattle ()
@@ -71,14 +68,15 @@ public class turnbasedScript : MonoBehaviour
 
         _dialogueText.text = "The Battle starts";
 
-        //set hud here
-
         yield return new WaitForSeconds(2f);
 
         _state = BattleState.PlayerTurn;
+
         _lifeUI.SetActive(true);
+
         UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
         UpdateLifeUI(_enemyLife, _enemy.GetLife, _enemy.GetTotalLife);
+        
         PlayerTurn();
 
     }
@@ -86,7 +84,7 @@ public class turnbasedScript : MonoBehaviour
     private void PlayerTurn ()
     {
         _dialogueText.text = "Choose an action...";
-        _attackUI.SetActive(true);
+        _attackCanvas.SetActive(true);
     }
 
     public void OnAttackButton ()
@@ -133,7 +131,7 @@ public class turnbasedScript : MonoBehaviour
         else
         {
             _state = BattleState.EnemyTurn;
-            _attackUI.SetActive(false);
+            _attackCanvas.SetActive(false);
             StartCoroutine(EnemyAttack());
         }
     }
@@ -147,7 +145,7 @@ public class turnbasedScript : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         _state = BattleState.EnemyTurn;
-        _attackUI.SetActive(false);
+        _attackCanvas.SetActive(false);
         StartCoroutine(EnemyAttack());
     }
 
@@ -203,7 +201,7 @@ public class turnbasedScript : MonoBehaviour
         } 
         else
         {
-            _dialogueText.text = "You were defeated..."; //this scares me
+            _dialogueText.text = "You were defeated...";
             _lifeUI.SetActive(false);
 
             yield return new WaitForSeconds(2.5f);
@@ -211,6 +209,8 @@ public class turnbasedScript : MonoBehaviour
             _player.EnablePlayerMovement();
             _checkpoint.ReturnToCheckpoint();
             _enemiesManager.EnableAllEnemies();
+
+            _tbCanvas.SetActive(false); //change this later to leantween animation
             _camera.orthographicSize = 5;
         }
         yield return null;
@@ -228,6 +228,7 @@ public class turnbasedScript : MonoBehaviour
 
     public void ActivateTurnBased()
     {
+        _tbCanvas.SetActive(true);
         StartCoroutine(SetupBattle());
         transform.position = _player.gameObject.transform.position;
         _camera.orthographicSize = 3;
