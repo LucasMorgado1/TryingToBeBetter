@@ -9,8 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7922d35880352614db39b2dc339adaac, type: 3}
-  m_Name: EnemySelected
+  m_Script: {fileID: 11500000, guid: 26561bbba19d8c34ab65af1e6b7078d6, type: 3}
+  m_Name: StrongEnemy
   m_EditorClassIdentifier: 
-  enemySelected: {fileID: 0}
-  enemyWasSelected: 1
+  _hp: 12
+  _normalAttack: 3
+  _strongAttack: 4
+  _enemyType: 2
+  _healAmount: 4

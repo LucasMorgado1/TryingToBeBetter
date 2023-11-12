@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.InputSystem;
@@ -46,17 +47,25 @@ public class player : MonoBehaviour
     #region Jump Variables
 
     [Header("Jump")]
+    
     [SerializeField] private float jumpForce;  // Força inicial do pulo
-    [SerializeField] private float originalJumpForce = 5f;
-    public float fallMultiplier = 2.5f;    // Multiplicador de queda para controlar a velocidade de queda
-    public float lowJumpMultiplier = 2f;   // Multiplicador de pulo baixo para controlar o arco do pulo
     [SerializeField] private int maxJumps = 2;  // Número máximo de pulos
-    private int currentJumps = 0;     // Pulos atuais
-    private bool isJumping = false;   // Está pulando?  2
-    private bool isGrounded = false;  // Está no chão?
+    [SerializeField] private float originalJumpForce = 5f;
     [SerializeField] private GroundChecker groundCheck;
     [SerializeField] private LayerMask groundLayer;
+
+    public float fallMultiplier = 2.5f;    // Multiplicador de queda para controlar a velocidade de queda
+    public float lowJumpMultiplier = 2f;   // Multiplicador de pulo baixo para controlar o arco do pulo
+    private float playerYpositionBeforeJump;
+   
+    private int currentJumps = 0;     // Pulos atuais
+
+    [HideInInspector]
+    public bool isJumping = false;   // Está pulando?  2
+    private bool isGrounded = false;  // Está no chão?
     private bool jumpPressed;
+    
+    private Rigidbody2D _rb;
 
     #endregion
 
@@ -72,12 +81,12 @@ public class player : MonoBehaviour
     private Animator animator;
     #endregion
 
-    #region Attacks && Health
+    #region Combat Variables
 
-    [Header("Attacks Damage")]
+    [Header("Combat Variables")]
+    [SerializeField] private int _maxHP = 10;
     private int _attackDamage = 1;
     private int _currentHp;
-    [SerializeField] private int _totalHp = 10;
 
     #endregion
 
@@ -97,7 +106,8 @@ public class player : MonoBehaviour
     public Rigidbody2D GetRigidbody => rb;
     public int GetLife { get => _currentHp; }
     public int SetLife { set => _currentHp = value; }
-    public int GetTotalLife {  get => _totalHp; }
+    public int GetTotalLife {  get => _maxHP; }
+    public GroundChecker OnGround { get => groundCheck; }
     #endregion
 
     #region Unity Methods
@@ -108,8 +118,10 @@ public class player : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         var action = new InputAction();
+        _rb = GetComponent<Rigidbody2D>();
+
         _playerControls.Player.Move.performed += ctx => moveDirection = ctx.ReadValue<float>();
-        _currentHp = _totalHp;
+        _currentHp = _maxHP;
         jumpForce = originalJumpForce;
     }
 
@@ -128,6 +140,9 @@ public class player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && currentJumps < maxJumps)
         {
+            playerYpositionBeforeJump = this.transform.position.y;
+            Debug.Log(playerYpositionBeforeJump);
+
             if (!isJumping)
             {
                 Jump();
@@ -138,6 +153,8 @@ public class player : MonoBehaviour
                 Jump();
             }
         }
+
+        //_jumpDebugText.text = _jumpState.ToString();
 
         // Aplica o multiplicador de queda para controlar a velocidade de queda
         if (rb.velocity.y < 0)
@@ -186,7 +203,6 @@ public class player : MonoBehaviour
     #endregion
 
     #region Movement
-
     private void Walk()
     {
         //calcula a direcao que queremos nos mover na velocidade desejada
@@ -227,6 +243,20 @@ public class player : MonoBehaviour
         localScale.x *= -1f;
         transform.localScale = localScale;
     }
+
+    public void DisablePlayerMovement()
+    {
+        SetMoveSpeed = 0;
+        FrictionAmount = 5;
+        jumpForce = 0;
+    }
+
+    public void EnablePlayerMovement()
+    {
+        SetMoveSpeed = originalMoveSpeed;
+        frictionAmout = originalFrictionAmout;
+        jumpForce = originalJumpForce;
+    }
     #endregion
 
     #region Friction
@@ -249,7 +279,6 @@ public class player : MonoBehaviour
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         currentJumps++;
     }
-
     #endregion
 
     #region Collisions
@@ -292,25 +321,17 @@ public class player : MonoBehaviour
     {
         _currentHp += amount;
 
-        if (_currentHp > _totalHp)
+        if (_currentHp > _maxHP)
         {
-            _currentHp = _totalHp;
+            _currentHp = _maxHP;
         }
     }
 
-    #endregion 
-
-    public void DisablePlayerMovement ()
+    public void RestoreHP ()
     {
-        SetMoveSpeed = 0;
-        FrictionAmount = 5;
-        jumpForce = 0;
+        _currentHp = _maxHP;
     }
 
-    public void EnablePlayerMovement()
-    {
-        SetMoveSpeed = originalMoveSpeed;
-        frictionAmout = originalFrictionAmout;
-        jumpForce = originalJumpForce;
-    }
+    #endregion
+
 }

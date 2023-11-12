@@ -9,6 +9,8 @@ public class playerTurnBased : MonoBehaviour
 
     //private GameObject _turnbasedCanvas;
     [SerializeField] private turnbasedScript _turnbasedScript;
+    private bool _playerIsJumping = false;
+    private bool once = false;
 
     #region Getter & Setters
     public player GetPlayerScript { get => _player; }
@@ -24,12 +26,43 @@ public class playerTurnBased : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+
         if (collision.CompareTag("Enemy"))
         {
-            _turnbasedScript.ActivateTurnBased();
-            _player.DisablePlayerMovement();
-            _turnbasedScript.SetEnemyScript = collision.GetComponent<Enemy>();
+            if (!_player.isJumping)
+            {
+                _player.DisablePlayerMovement();
+                _turnbasedScript.ActivateTurnBased();
+                _turnbasedScript.SetEnemyScript = collision.GetComponent<Enemy>();
+            } 
+            else
+            {
+                _player.DisablePlayerMovement();
+                _playerIsJumping = true;
+            }
         }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Enemy"))
+        {
+            if (_playerIsJumping && !once)
+            {
+                if (!_player.isJumping)
+                {
+                    once = true;
+                    _turnbasedScript.ActivateTurnBased();
+                    _turnbasedScript.SetEnemyScript = collision.GetComponent<Enemy>();
+                }
+            }
+            Debug.Log("is touching here");
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        once = false;
     }
 
     public void OnExitBattle ()

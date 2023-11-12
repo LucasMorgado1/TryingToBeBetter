@@ -3,78 +3,56 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Enemy : MouseHandler
+public class Enemy : MonoBehaviour
 {
     [Header("Enemy Variables")]
-    [SerializeField] private int _life;
-    [SerializeField] [Range(1, 3)] private int _enemyQuantity;
     [SerializeField] private turnbasedScript _turnbasedScript;
-    private Animator _animator;
-    private BoxCollider2D _collider;
+    [SerializeField] private EnemyScriptableObject _enemyScriptableObject;
 
-    private GameObject _enemyInstantiated1;
-    private GameObject _enemyInstantiated2;
+    [Header("Combat Variables")]
+    private int _hp;
+    private int _maxHP;
+    private int _normalDamage;
+    private int _strongDamage;
+    private int _healAmount;
 
-    private bool playerIsAttacking = false;
-    private bool _enteredOnce = false;
-    
-    private int _numberofEnemiesSpawned = default;
-    private int _totalLife = 10;
-
-    [Header("Damage")]
-    [SerializeField] private int _normalDamage = default;
-    [SerializeField] private int _strongDamage = default;
+    private EnemyType _enemyType;
+    private int _enemyIndex;
 
     #region Getter/Setter
-    public int GetEnemyQuantity { get => _enemyQuantity; }
-    public bool SetPlayerIsAttacking { set => playerIsAttacking = value; }
-    public int GetLife { get => _life; }
-    public int SetLife { set => _life = value; }
-    public int GetTotalLife { get => _totalLife; }
+    public int GetLife { get => _hp; }
+    public int SetLife { set => _hp = value; }
+    public int GetTotalLife { get => _maxHP; }
     public int GetNormalDamage { get => _normalDamage; }
     public int GetStrongDamage { get => _strongDamage; }
+    public int GetIndex { get => _enemyIndex; }
     #endregion
 
     private void Awake()
     {
-        _animator = GetComponent<Animator>();
-        _collider = GetComponent<BoxCollider2D>();
-        _life = _totalLife;
-    }
+        _enemyIndex = GetComponent<Index>().GetIndex;
 
-    public void DestroySpawnedEnemy ()
-    {
-        Destroy(_enemyInstantiated1);
-        Destroy(this.gameObject);
-        _enteredOnce = false;
+        _maxHP = _enemyScriptableObject._hp;
+        _hp = _maxHP;
 
+        _normalDamage = _enemyScriptableObject._normalAttack;
+        _strongDamage = _enemyScriptableObject._strongAttack;
+        _enemyType = _enemyScriptableObject._enemyType;
+        _healAmount = _enemyScriptableObject._healAmount;
     }
 
     public bool TakeDamage(int damage)
     { 
-        _life -= damage;
+        _hp -= damage;
 
-        if (_life <= 0)
+        if (_hp <= 0)
             return true;
         else
             return false;
     }
 
-    public override void OnPointerClick(PointerEventData eventData)
+    public void RestoreFullHP ()
     {
-        //if (this.gameObject.layer == 8)
-        //    _turnbasedScript.SetEnemySelectedByThePlayer = this.gameObject;
-    }
-
-    public override void OnPointerEnter(PointerEventData eventData)
-    {
-        if (this.gameObject.layer == 8)
-            _animator.SetBool("PlayerIsAttacking", true);
-    }
-
-    public override void OnPointerExit(PointerEventData eventData)
-    {
-        if (this.gameObject.layer == 8)
-            _animator.SetBool("PlayerIsAttacking", false);
+        _hp = _maxHP;
     }
 }
