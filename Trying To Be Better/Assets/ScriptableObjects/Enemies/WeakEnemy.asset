@@ -17,3 +17,4 @@ MonoBehaviour:
   _strongAttack: 2
   _enemyType: 0
   _healAmount: 2
+  _sprite: {fileID: 21300000, guid: 13ef47bc5ececd24fbd9b12a43e83012, type: 3}

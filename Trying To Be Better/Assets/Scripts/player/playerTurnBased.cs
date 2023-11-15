@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class playerTurnBased : MonoBehaviour
 {
+    [SerializeField] private turnbasedScript _turnbasedScript;
+    [SerializeField] private SmoothFollow _cameraSmoothFollow;
     private player _player;
+
     private int playerLife = 10;
 
-    //private GameObject _turnbasedCanvas;
-    [SerializeField] private turnbasedScript _turnbasedScript;
     private bool _playerIsJumping = false;
     private bool once = false;
 
@@ -29,6 +30,7 @@ public class playerTurnBased : MonoBehaviour
 
         if (collision.CompareTag("Enemy"))
         {
+            _cameraSmoothFollow.smoothTime = 0;
             if (!_player.isJumping)
             {
                 _player.DisablePlayerMovement();
@@ -63,6 +65,7 @@ public class playerTurnBased : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
         once = false;
+        _cameraSmoothFollow.smoothTime = 0.3f;
     }
 
     public void OnExitBattle ()

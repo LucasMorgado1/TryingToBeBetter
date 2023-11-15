@@ -783,12 +783,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _enemiesManager: {fileID: 1214499799}
   _checkpoint: {fileID: 1026613371}
-  _playerImages: {fileID: 21300000, guid: 598c5a47721325a4f92cad49f5ad9e4c, type: 3}
-  _enemiesImage:
-  - {fileID: 21300000, guid: 13ef47bc5ececd24fbd9b12a43e83012, type: 3}
-  - {fileID: 21300000, guid: 0d9c26ef2511c6d49a32368ae47b2aa9, type: 3}
-  - {fileID: 21300000, guid: 833de23bf8e006746ad31e418ddbc043, type: 3}
-  - {fileID: 21300000, guid: 1b8b64d6d77f3c94cb453b6c6c17c48a, type: 3}
   _playerBattlePosition: {fileID: 1586894857}
   _enemyBattlePosition: {fileID: 992521981}
   _player: {fileID: 769518921}
@@ -796,7 +790,6 @@ MonoBehaviour:
   _tbCanvas: {fileID: 317114432}
   _playerLife: {fileID: 1000056018}
   _enemyLife: {fileID: 1036048006}
-  enemyHeal: 4
 --- !u!1 &321407244
 GameObject:
   m_ObjectHideFlags: 0
@@ -2197,6 +2190,7 @@ MonoBehaviour:
     m_Bits: 8
   fallMultiplier: 5
   lowJumpMultiplier: 2
+  isJumping: 0
   _maxHP: 10
 --- !u!212 &769518922
 SpriteRenderer:
@@ -2463,6 +2457,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _turnbasedScript: {fileID: 317114437}
+  _cameraSmoothFollow: {fileID: 519420033}
 --- !u!1 &900061194
 GameObject:
   m_ObjectHideFlags: 0

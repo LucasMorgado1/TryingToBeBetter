@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using Febucci.UI;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public enum BattleState { Start, PreparingPlayer, PlayerTurn, EnemyTurn, Won, Lost}
 
@@ -12,10 +13,6 @@ public class turnbasedScript : MonoBehaviour
     private Camera _camera;
     [SerializeField] private EnemiesManager _enemiesManager;
     [SerializeField] private Checkpoint _checkpoint;
-
-    [Header("Prefabs")]
-    [SerializeField] private Sprite _playerImages;
-    [SerializeField] private Sprite[] _enemiesImage;
 
     [Header("BattlePosition")]
     [SerializeField] private Image _playerBattlePosition;
@@ -36,7 +33,6 @@ public class turnbasedScript : MonoBehaviour
     private GameObject _lifeUI;
 
     [Header("Enemy")]
-    [SerializeField] private int enemyHeal = 4;
     private Enemy _enemy;
     private bool  _getRandomRoll = false;
     private int chanceOfMiss;
@@ -90,8 +86,8 @@ public class turnbasedScript : MonoBehaviour
         _playerLife.transform.parent.gameObject.GetComponent<TextMeshProUGUI>().text = _player.name.ToUpper(); //change the text according to the player's name
         _enemyLife.transform.parent.gameObject.GetComponent<TextMeshProUGUI>().text = _enemy.name.ToUpper(); //change the text according to the enemy name
 
-        _playerBattlePosition.sprite = _playerImages;
-        _enemyBattlePosition.sprite = _enemiesImage[_enemy.GetIndex];
+        _playerBattlePosition.sprite = _player.GetComponent<SpriteRenderer>().sprite;
+        _enemyBattlePosition.sprite = _enemy.GetSprite;
 
         PlayerTurn();
 
@@ -190,29 +186,10 @@ public class turnbasedScript : MonoBehaviour
     #region Enemy Turn
     IEnumerator EnemyAttack ()
     {
-        bool isDead;
+        bool isDead = false; ;
         _dialogueText.text = _enemy.name + " attacks...";
 
-        yield return new WaitForSeconds(2.5f);
-
-        if (RollDice() >= 1 && RollDice() <= 7)
-        {
-            isDead = _player.TakeDamage(_enemy.GetNormalDamage);
-            UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
-            _dialogueText.text = _enemy.name + " attacks, causing " + _enemy.GetNormalDamage + " of damage";
-        }
-        else if (RollDice() >= 8 && RollDice() <= 9)
-        {
-            isDead = _player.TakeDamage(_enemy.GetStrongDamage);
-            UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
-            _dialogueText.text = _enemy.name + " attacks, causing " + _enemy.GetStrongDamage + " of damage";
-        }
-        else
-        {
-            isDead = false;
-            UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
-            _dialogueText.text = "Enemy missed his attack!!";
-        }
+        CallRandomAttack(_enemy.GetEnemyType, isDead);
 
         yield return new WaitForSeconds(4f);
 
@@ -230,46 +207,46 @@ public class turnbasedScript : MonoBehaviour
 
     }
 
-    private void RandomEnemyAttack (int normalAttack, int strongAttack, EnemyType enemyType)
+    private void CallRandomAttack(EnemyType enemyType, bool isDead)
     {
-        bool isDead;
+        switch (enemyType)
+        {
+            case EnemyType.Weak:
+                RandomEnemyAttack(_enemy.GetNormalDamage, _enemy.GetStrongDamage, enemyType, 1, 9, 0, 0, isDead);
+                break;
+            case EnemyType.Medium:
+                RandomEnemyAttack(_enemy.GetNormalDamage, _enemy.GetStrongDamage, enemyType, 1, 8, 9, 9, isDead);
+                break;
+            case EnemyType.Strong:
+                RandomEnemyAttack(_enemy.GetNormalDamage, _enemy.GetStrongDamage, enemyType, 1, 6, 7, 8, isDead);
+                break;
+            case EnemyType.Hard:
+                RandomEnemyAttack(_enemy.GetNormalDamage, _enemy.GetStrongDamage, enemyType, 1, 5, 6, 8, isDead);
+                break;
+            default:
+                break;
+        }
+    }
 
-        Something(enemyType);
-
-        if (RollDice() >= 1 && RollDice() <= 7)
+    private void RandomEnemyAttack (int normalAttack, int strongAttack, EnemyType enemyType, int minNormal, int maxNormal, int minStrong, int maxStrong, bool isDead)
+    {
+        if (RollDice() >= minNormal && RollDice() <= maxNormal)
         {
             isDead = _player.TakeDamage(normalAttack);
             UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
-            _dialogueText.text = _enemy.name + " attacks, causing " + normalAttack + " of damage";
+            _dialogueText.text = _enemy.name + " attacks causing " + normalAttack + " of damage";
         }
-        else if (RollDice() >= 8 && RollDice() <= 9)
+        else if (RollDice() >= minStrong && RollDice() <= maxStrong)
         {
             isDead = _player.TakeDamage(strongAttack);
             UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
-            _dialogueText.text = _enemy.name + " attacks, causing " + strongAttack + " of damage";
+            _dialogueText.text = _enemy.name.ToUpper() + " attacks causing " + strongAttack + " of damage";
         }
         else
         {
             isDead = false;
             UpdateLifeUI(_playerLife, _player.GetLife, _player.GetTotalLife);
-            _dialogueText.text = "Enemy has missed his attack!!";
-        }
-    }
-
-    private void Something(EnemyType enemyType)
-    {
-        switch (enemyType)
-        {
-            case EnemyType.Weak:
-                break;
-            case EnemyType.Medium:
-                break;
-            case EnemyType.Strong:
-                break;
-            case EnemyType.Hard:
-                break;
-            default:
-                break;
+            _dialogueText.text = _enemy.name.ToUpper() + " has missed his attack!!";
         }
     }
 

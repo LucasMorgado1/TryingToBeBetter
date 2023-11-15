@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,4 +12,5 @@ public class EnemyScriptableObject : ScriptableObject
     public int _strongAttack = default;
     public EnemyType _enemyType = default;
     public int _healAmount = default;
+    public Sprite _sprite = default;
 }
