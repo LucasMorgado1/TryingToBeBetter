@@ -9,14 +9,13 @@ public class Enemy : MonoBehaviour
     [SerializeField] private EnemyScriptableObject _enemyScriptableObject;
 
     [Header("Combat Variables")]
+    [SerializeField]
     private int _hp;
     private int _maxHP;
     private int _normalDamage;
     private int _strongDamage;
-    private int _healAmount;
-    private int[] attacksChances = new int[4];
     private SpriteRenderer _spriteRenderer;
-
+    private int _healAmount;
     private EnemyType _enemyType;
     private int _enemyIndex;
 
@@ -27,6 +26,7 @@ public class Enemy : MonoBehaviour
     public int GetNormalDamage { get => _normalDamage; }
     public int GetStrongDamage { get => _strongDamage; }
     public int GetIndex { get => _enemyIndex; }
+    public int GetHealAmount => _healAmount;
     public Sprite GetSprite { get => _spriteRenderer.sprite; }
     public EnemyType GetEnemyType { get => _enemyType; }
     #endregion
@@ -44,6 +44,7 @@ public class Enemy : MonoBehaviour
         _enemyType = _enemyScriptableObject._enemyType;
         _healAmount = _enemyScriptableObject._healAmount;
         _spriteRenderer.sprite = _enemyScriptableObject._sprite;
+        _healAmount = _enemyScriptableObject._healAmount;
     }
 
     public bool TakeDamage(int damage)
@@ -54,6 +55,11 @@ public class Enemy : MonoBehaviour
             return true;
         else
             return false;
+    }
+
+    public void HealEnemy (int healAmount)
+    {
+        _hp += healAmount;
     }
 
     public void RestoreFullHP ()

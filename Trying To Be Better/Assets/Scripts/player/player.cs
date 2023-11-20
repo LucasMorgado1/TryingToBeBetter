@@ -73,8 +73,17 @@ public class player : MonoBehaviour
 
     [Header("Interactable")]
     private int npcLayerMask = 6;
-    private bool interacted = false;
+    private bool _interacted = false;
 
+    #endregion
+
+    #region Dash Variables
+    [Header("Dash Variables")]
+    [SerializeField] private float dashCooldown;
+    [SerializeField] private float dashForce;
+    private float dashTime = 0.2f;
+    private bool _pressedDash = default;
+    private bool _canDash = true;
     #endregion
 
     #region Animator Variables
@@ -141,7 +150,6 @@ public class player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && currentJumps < maxJumps)
         {
             playerYpositionBeforeJump = this.transform.position.y;
-            Debug.Log(playerYpositionBeforeJump);
 
             if (!isJumping)
             {
@@ -181,6 +189,17 @@ public class player : MonoBehaviour
             }
             Friction();
         }
+        
+        if (_pressedDash)
+        {
+            Debug.Log("deu dash");
+            if (_canDash)
+            {
+                _canDash = false;
+                //PerformDash();
+                StartCoroutine(Dash());
+            }
+        }
     }
     #endregion
 
@@ -198,7 +217,12 @@ public class player : MonoBehaviour
 
     public void InteractHandler(InputAction.CallbackContext ctx)
     {
-        interacted = ctx.performed;
+        _interacted = ctx.performed;
+    }
+
+    public void DashHandler (InputAction.CallbackContext ctx)
+    {
+        _pressedDash = ctx.performed;
     }
     #endregion
 
@@ -249,6 +273,7 @@ public class player : MonoBehaviour
         SetMoveSpeed = 0;
         FrictionAmount = 5;
         jumpForce = 0;
+        _canDash = false;
     }
 
     public void EnablePlayerMovement()
@@ -256,6 +281,7 @@ public class player : MonoBehaviour
         SetMoveSpeed = originalMoveSpeed;
         frictionAmout = originalFrictionAmout;
         jumpForce = originalJumpForce;
+        _canDash = true;
     }
     #endregion
 
@@ -281,6 +307,30 @@ public class player : MonoBehaviour
     }
     #endregion
 
+    #region Dash
+
+    IEnumerator Dash ()
+    {
+        float originalGravity = rb.gravityScale;
+        rb.gravityScale = 0;
+        
+        float dashSpeed = (dashForce + moveDirection) * direction;
+        Vector2 dashDirection = new Vector2(this.transform.position.x + dashSpeed, this.transform.position.y);
+        
+        rb.AddForce(dashDirection);
+
+        yield return new WaitForSeconds(dashTime);
+
+        rb.gravityScale = originalGravity;
+
+        yield return new WaitForSeconds(dashCooldown);
+
+        _canDash = true;
+
+    }
+
+    #endregion
+
     #region Collisions
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -295,7 +345,7 @@ public class player : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (interacted)
+        if (_interacted)
         {
             if (collision.gameObject.CompareTag("NPC") && collision.gameObject.layer == npcLayerMask)
             {

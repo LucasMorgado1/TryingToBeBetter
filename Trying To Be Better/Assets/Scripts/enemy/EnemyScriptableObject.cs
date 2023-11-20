@@ -10,7 +10,8 @@ public class EnemyScriptableObject : ScriptableObject
     public int _hp = default;
     public int _normalAttack = default;
     public int _strongAttack = default;
-    public EnemyType _enemyType = default;
+    [Range(1, 5)]
     public int _healAmount = default;
+    public EnemyType _enemyType = default;
     public Sprite _sprite = default;
 }

@@ -15,7 +15,6 @@ MonoBehaviour:
   _hp: 8
   _normalAttack: 3
   _strongAttack: 5
+  _healAmount: 2
   _enemyType: 3
-  _healAmount: 5
   _sprite: {fileID: 21300000, guid: 1b8b64d6d77f3c94cb453b6c6c17c48a, type: 3}
-  _index: 01000000050000000600000008000000
