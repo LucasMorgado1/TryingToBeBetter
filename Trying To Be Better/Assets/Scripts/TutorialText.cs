@@ -2,16 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 
 public class TutorialText : MonoBehaviour
 {
     private bool fadeIsComplete = true;
+    private bool _once = false; //bool to not stack calling the function WaitForFadeEnds
     private TextMeshProUGUI _text;
+
+    public delegate IEnumerator CallFunction();
+    public CallFunction _callFunction;
+    public static event CallFunction _delegateEvent;
 
     // Start is called before the first frame update
     void Awake()
     {
         _text = GetComponent<TextMeshProUGUI>();
+    }
+
+    private void Start()
+    {
+        //_text.color = new Color (1,1,1,0.15f);
+    }
+
+    private void SetListener(CallFunction eventFunction)
+    {
+        _callFunction = eventFunction;
+        _delegateEvent += eventFunction;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -28,6 +45,13 @@ public class TutorialText : MonoBehaviour
         if (collision.CompareTag("Player") && fadeIsComplete)
         {
             StartCoroutine(FadeOut());
+        }
+
+        if (collision.CompareTag("Player") && !fadeIsComplete && !_once)
+        {
+            _once = true;
+            SetListener(FadeOut);
+            StartCoroutine(WaitForFadeEnds(fadeIsComplete));
         }
     }
 
@@ -57,7 +81,7 @@ public class TutorialText : MonoBehaviour
 
     IEnumerator FadeOut ()
     {
-        if (_text.color.a <= 0.1f)
+        if (_text.color.a <= 0.05f)
         {
             yield break; 
         }
@@ -70,6 +94,26 @@ public class TutorialText : MonoBehaviour
             yield return null;
         }
 
+        if (_text.color.a >= 0.05)
+        {
+            _text.color = new Color(1, 1, 1, 0);
+        }
+
         fadeIsComplete = true;
+    }
+
+    IEnumerator WaitForFadeEnds (bool fade)
+    {
+        Debug.Log("entered the waitforfadeends");
+
+        while (fadeIsComplete == false)
+        {
+            Debug.Log("entered the while");
+            yield return null;
+        }
+
+        Debug.Log("called the function");
+        StartCoroutine(_delegateEvent());
+        _once = false;
     }
 }
