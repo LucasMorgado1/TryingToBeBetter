@@ -57,6 +57,11 @@ public class TutorialText : MonoBehaviour
 
     IEnumerator FadeIn ()
     {
+        if (!this.gameObject.activeInHierarchy)
+        {
+            yield return null;
+        }
+
         if (_text.color.a >= 0.9f)
         {
             yield break;
@@ -81,6 +86,11 @@ public class TutorialText : MonoBehaviour
 
     IEnumerator FadeOut ()
     {
+        if (!this.gameObject.activeInHierarchy)
+        {
+            yield return null;
+        }
+
         if (_text.color.a <= 0.05f)
         {
             yield break; 
@@ -104,15 +114,16 @@ public class TutorialText : MonoBehaviour
 
     IEnumerator WaitForFadeEnds (bool fade)
     {
-        Debug.Log("entered the waitforfadeends");
-
-        while (fadeIsComplete == false)
+        if (!this.gameObject.activeInHierarchy)
         {
-            Debug.Log("entered the while");
             yield return null;
         }
 
-        Debug.Log("called the function");
+        while (fadeIsComplete == false)
+        {
+            yield return null;
+        }
+
         StartCoroutine(_delegateEvent());
         _once = false;
     }

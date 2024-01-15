@@ -72,7 +72,7 @@ public class player : MonoBehaviour
     #region Interaction Variables
 
     [Header("Interactable")]
-    private int npcLayerMask = 6;
+    private int interactableLayerMask = 6;
     private bool _interacted = false;
 
     #endregion
@@ -336,7 +336,7 @@ public class player : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // Verifica se a colisão ocorreu com o objeto "Ground" e se a parte de baixo do jogador está tocando o chão
-        if (collision.gameObject.CompareTag("Ground") && groundCheck.IsGrounded())
+        if (collision.gameObject.CompareTag(StringUtils.Tags.Ground) && groundCheck.IsGrounded())
         {
             currentJumps = 0;
             isJumping = false;
@@ -347,9 +347,14 @@ public class player : MonoBehaviour
     {
         if (_interacted)
         {
-            if (collision.gameObject.CompareTag("NPC") && collision.gameObject.layer == npcLayerMask)
+            if (collision.gameObject.CompareTag(StringUtils.Tags.NPC) && collision.gameObject.layer == interactableLayerMask)
             {
                 Debug.Log("Interacted with a NPC");
+            }
+
+            if (collision.gameObject.CompareTag(StringUtils.Tags.Teleport) && collision.gameObject.layer == interactableLayerMask)
+            {
+                ChangeScene.Instance.LoadScene(StringUtils.SceneName.CombatWorld);
             }
         }
     }

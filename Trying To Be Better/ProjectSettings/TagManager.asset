@@ -8,6 +8,7 @@ TagManager:
   - NPC
   - Enemy
   - TurnbasedArea
+  - Teleport
   layers:
   - Default
   - TransparentFX
@@ -56,4 +57,7 @@ TagManager:
     locked: 0
   - name: canvas
     uniqueID: 2021772611
+    locked: 0
+  - name: teleport
+    uniqueID: 1741125395
     locked: 0

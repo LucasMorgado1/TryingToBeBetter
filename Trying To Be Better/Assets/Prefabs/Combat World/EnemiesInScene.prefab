@@ -34,7 +34,7 @@ Transform:
   - {fileID: 6625119081894545173}
   - {fileID: 3855375933457762815}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5952531969929711449
 MonoBehaviour:
@@ -66,10 +66,9 @@ GameObject:
   - component: {fileID: 5790129634054745361}
   - component: {fileID: 8898600796142441445}
   - component: {fileID: 8562087202183765341}
-  - component: {fileID: 3153027648698911361}
   - component: {fileID: 5436364687282501736}
   m_Layer: 7
-  m_Name: Hard Enemy
+  m_Name: Golem
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -157,6 +156,7 @@ MonoBehaviour:
   _turnbasedScript: {fileID: 0}
   _enemyScriptableObject: {fileID: 11400000, guid: f89b644ba15de9a44a4642c872cfc4f2, type: 2}
   _hp: 0
+  _name: 0
 --- !u!61 &8562087202183765341
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -202,27 +202,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 6.0580215, y: 3.3917787}
   m_EdgeRadius: 0
---- !u!95 &3153027648698911361
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1139911288341424883}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: fb62516fd81307f43af2c7b6b4ea46d5, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &5436364687282501736
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,10 +227,9 @@ GameObject:
   - component: {fileID: 4540071425036354390}
   - component: {fileID: 4074835109059028564}
   - component: {fileID: 8795539008032078010}
-  - component: {fileID: 2888567906581914329}
   - component: {fileID: 9023651351564014006}
   m_Layer: 7
-  m_Name: Weak Enemy
+  m_Name: Slime
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -265,7 +243,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6534397232066791664}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 27.2, y: 0.1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -313,7 +291,7 @@ SpriteRenderer:
   m_SortingLayerID: -612514357
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 13ef47bc5ececd24fbd9b12a43e83012, type: 3}
+  m_Sprite: {fileID: -1088775654, guid: e5fae4411507827448d3ef6d6606979b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -339,6 +317,7 @@ MonoBehaviour:
   _turnbasedScript: {fileID: 0}
   _enemyScriptableObject: {fileID: 11400000, guid: fbb39277ed2067443993cb924f6b624a, type: 2}
   _hp: 0
+  _name: 0
 --- !u!61 &8795539008032078010
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -375,7 +354,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.875, y: 0.6875}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -384,27 +363,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 6.0580215, y: 3.3917787}
   m_EdgeRadius: 0
---- !u!95 &2888567906581914329
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6534397232066791664}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: fb62516fd81307f43af2c7b6b4ea46d5, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &9023651351564014006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -430,10 +388,9 @@ GameObject:
   - component: {fileID: 8958457257762221569}
   - component: {fileID: 2951067307360511882}
   - component: {fileID: 1410887267399726733}
-  - component: {fileID: 8488638505639832189}
   - component: {fileID: 3981931217522264603}
   m_Layer: 7
-  m_Name: Medium Enemy
+  m_Name: Gnome
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -521,6 +478,7 @@ MonoBehaviour:
   _turnbasedScript: {fileID: 0}
   _enemyScriptableObject: {fileID: 11400000, guid: b708dfd60954b824c89a7d9427f1adc0, type: 2}
   _hp: 0
+  _name: 0
 --- !u!61 &1410887267399726733
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -566,27 +524,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 6.0580215, y: 3.3917787}
   m_EdgeRadius: 0
---- !u!95 &8488638505639832189
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7484308786379335171}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: fb62516fd81307f43af2c7b6b4ea46d5, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &3981931217522264603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -612,10 +549,9 @@ GameObject:
   - component: {fileID: 996316520338716698}
   - component: {fileID: 4126694730149195977}
   - component: {fileID: 5467100581484334424}
-  - component: {fileID: 90469050471545121}
   - component: {fileID: 9038113278859519106}
   m_Layer: 7
-  m_Name: Strong Enemy
+  m_Name: Cyclope
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -703,6 +639,7 @@ MonoBehaviour:
   _turnbasedScript: {fileID: 0}
   _enemyScriptableObject: {fileID: 11400000, guid: 8089894158aa1ac45b7628b9907f9d87, type: 2}
   _hp: 0
+  _name: 0
 --- !u!61 &5467100581484334424
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -748,27 +685,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 6.0580215, y: 3.3917787}
   m_EdgeRadius: 0
---- !u!95 &90469050471545121
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8341260251224402199}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: fb62516fd81307f43af2c7b6b4ea46d5, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &9038113278859519106
 MonoBehaviour:
   m_ObjectHideFlags: 0
