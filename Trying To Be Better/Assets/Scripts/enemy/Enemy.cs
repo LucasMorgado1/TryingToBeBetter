@@ -32,14 +32,10 @@ public class Enemy : MonoBehaviour
     private Action _action = Action.walking;
     [SerializeField] private Name _name;
 
-    [Header("Slime Variables")]
-    private float _slimeVelocity = 2f;
-    private float _originalSlimeVelocity;
-
-
     [Header("Enemies Variables")]
-    private float _velocity = 10f;
-    private float _distance = 2f;
+    private float _velocity;
+    private float _originalVelocity;
+    private float _distance = 3f;
     private Vector2 _leftPoint;
     private Vector2 _rightPoint;
     private Vector2 _startPosition;
@@ -74,19 +70,20 @@ public class Enemy : MonoBehaviour
         _healAmount = _enemyScriptableObject._healAmount;
         _spriteRenderer.sprite = _enemyScriptableObject._sprite;
         _healAmount = _enemyScriptableObject._healAmount;
+        _velocity = _enemyScriptableObject._velocity;
+        _distance = _enemyScriptableObject._distance;
     }
 
     private void Start()
     {
         _startPosition = this.transform.position;
-        _originalSlimeVelocity = _slimeVelocity;
+        _originalVelocity = _velocity;
         _leftPoint = new Vector2(_startPosition.x - _distance, _startPosition.y);
         _rightPoint = new Vector2(_startPosition.x + _distance, _startPosition.y);
         _side = Side.right;
         _action = Action.walking;
 
-        Debug.Log(_name + " _leftPoint.x: " + _leftPoint);
-        Debug.Log(_name + " _righPoint.x: " + _rightPoint);
+        Debug.Log("Name: " + _name + ", distance: " + _distance + ", velocity: " + _velocity);
     }
 
     private void Update()
@@ -100,10 +97,22 @@ public class Enemy : MonoBehaviour
                 }
                 break;
             case Name.Gnome:
+                if (_side == Side.right || _side == Side.left && _action == Action.walking)
+                {
+                    Walking();
+                }
                 break;
             case Name.Cyclope:
+                if (_side == Side.right || _side == Side.left && _action == Action.walking)
+                {
+                    Walking();
+                }
                 break;
             case Name.Golem:
+                if (_side == Side.right || _side == Side.left && _action == Action.walking)
+                {
+                    Walking();
+                }
                 break;
             case Name.None:
                 break;
@@ -124,15 +133,15 @@ public class Enemy : MonoBehaviour
     
     private void Walking ()
     {
-        _slimeVelocity = _originalSlimeVelocity;
+        _velocity = _originalVelocity;
 
         if (_side == Side.right && _action == Action.walking)
         {
             if (_rightPoint.x > transform.position.x)
             {
                 _isFacingRight = true;
-                _slimeVelocity = Mathf.Abs(_slimeVelocity);
-                Walk(_slimeVelocity);
+                _velocity = Mathf.Abs(_velocity);
+                Walk(_velocity);
                 transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
 
                 if (Vector2.Distance(_rightPoint, transform.position) < 0.9f)
@@ -149,8 +158,8 @@ public class Enemy : MonoBehaviour
             {
                 _lastWalkingSide = Side.right;
                 _isFacingRight = false;
-                _slimeVelocity = Mathf.Abs(_slimeVelocity) * -1;
-                Walk(_slimeVelocity);
+                _velocity = Mathf.Abs(_velocity) * -1;
+                Walk(_velocity);
                 transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x) * -1, transform.localScale.y, transform.localScale.z);
 
                 if (Vector2.Distance(_leftPoint, transform.position) < 0.9f)
@@ -169,8 +178,8 @@ public class Enemy : MonoBehaviour
 
         if (_side == Side.idle && _action == Action.idle)
         {
-            _slimeVelocity = 0f;
-            Walk(_slimeVelocity);
+            _velocity = 0f;
+            Walk(_velocity);
         }
 
         yield return new WaitForSeconds(2f);
@@ -186,6 +195,12 @@ public class Enemy : MonoBehaviour
         Vector3 localScale = transform.localScale;
         localScale.x *= -1f;
         transform.localScale = localScale;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(_leftPoint, _rightPoint);
     }
 
     #region Enemy Take Damage
