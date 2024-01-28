@@ -1,14 +1,15 @@
 using System;
 using System.Collections;
 using System.Linq;
+using TMPro;
+using UnityEditor;
 using UnityEngine;
-
-
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Enemy : MonoBehaviour
 {
-    enum Side { left, right, idle}
-    enum Action { attacking, walking, idle }
+    enum Side { left, right, idle, chasing, returning}
+    enum Action { attacking, walking, idle, chasing, combat, returning}
     enum Name { Slime, Gnome, Cyclope, Golem, None }
 
     [Header("Enemy Variables")]
@@ -16,9 +17,10 @@ public class Enemy : MonoBehaviour
     [SerializeField] private EnemyScriptableObject _enemyScriptableObject;
     private Rigidbody2D _rb;
     private Animator _animator;
+    private BoxCollider2D _boxCollider;
 
     [Header("Combat Variables")]
-    [SerializeField] private int _hp;
+    private int _hp;
     private int _maxHP;
     private int _normalDamage;
     private int _strongDamage;
@@ -41,6 +43,12 @@ public class Enemy : MonoBehaviour
     private Vector2 _startPosition;
     private bool _isFacingRight;
     private Side _lastWalkingSide;
+    [SerializeField] private float _distanceOffSet;
+    [SerializeField] private float _maxChasingDistance;
+    private Vector2 _moveDirection; //move into target direction when chasing
+
+    [Header("Target")]
+    [SerializeField] private GameObject _target;
 
     #region Getter/Setter
     public int GetLife { get => _hp; }
@@ -60,6 +68,7 @@ public class Enemy : MonoBehaviour
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _rb = GetComponent<Rigidbody2D>();  
         _animator = GetComponent<Animator>();
+        _boxCollider = GetComponent<BoxCollider2D>();
 
         _maxHP = _enemyScriptableObject._hp;
         _hp = _maxHP;
@@ -88,43 +97,45 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        switch (_name)
-        {
-            case Name.Slime:
-                if (_side == Side.right || _side == Side.left && _action == Action.walking)
-                {
-                    Walking();
-                }
-                break;
-            case Name.Gnome:
-                if (_side == Side.right || _side == Side.left && _action == Action.walking)
-                {
-                    Walking();
-                }
-                break;
-            case Name.Cyclope:
-                if (_side == Side.right || _side == Side.left && _action == Action.walking)
-                {
-                    Walking();
-                }
-                break;
-            case Name.Golem:
-                if (_side == Side.right || _side == Side.left && _action == Action.walking)
-                {
-                    Walking();
-                }
-                break;
-            case Name.None:
-                break;
-            default:
-                break;
-        }
 
         if (!_isFacingRight && _side == Side.left)
             FlipSprite();
         else if (_isFacingRight && _side == Side.right)
             FlipSprite();
     }
+
+    private void FixedUpdate()
+    {
+        switch (_action)
+        {
+            case Action.attacking:
+                break;
+            case Action.walking:
+                if (_side == Side.right || _side == Side.left)
+                    Walking();
+                break;
+            case Action.idle:
+                break;
+            case Action.chasing:
+                if (_side == Side.chasing)
+                    ChasePlayer();
+                break;
+            case Action.combat:
+                if (_side == Side.idle)
+                    StopEnemyMovement();
+                break;
+            case Action.returning:
+                if (_side == Side.returning)
+                    ReturnToStartPosition();
+                break;
+            default:
+                break;
+        }
+
+        CalculateDistanceBetweenPlayer();
+    }
+
+    #region Walk Behavior
 
     private void Walk(float velocity)
     {
@@ -197,10 +208,92 @@ public class Enemy : MonoBehaviour
         transform.localScale = localScale;
     }
 
-    private void OnDrawGizmos()
+    #endregion
+
+    #region Chase the Player
+
+    private void CalculateDistanceBetweenPlayer()
     {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(_leftPoint, _rightPoint);
+        if (Vector3.Distance(_target.transform.position, this.transform.position) < this._boxCollider.size.x + _distanceOffSet && _side != Side.returning && _action != Action.returning)
+        {
+            Vector3 direction = (_target.transform.position - this.transform.position).normalized;
+            _moveDirection = direction;
+            _side = Side.chasing;
+            _action = Action.chasing;
+        }
+    }
+
+    private void ChasePlayer()
+    {
+        if (_side == Side.chasing && _action == Action.chasing) 
+        {
+            _velocity = Mathf.Abs(_velocity);
+            _rb.velocity = new Vector3(_moveDirection.x, 0, 0) * _velocity;
+
+            if (Vector3.Distance(this.transform.position, _startPosition) > _maxChasingDistance)
+            {
+                Debug.Log("I've gone too far, so Im coming back to my original position");
+                _side = Side.returning;
+                _action = Action.returning;
+            }
+        }
+    }
+
+    private void ReturnToStartPosition()
+    {
+        if (_side == Side.returning && _action == Action.returning)
+        {
+            if (this.transform.position.x < _startPosition.x)
+            {
+                _velocity = Mathf.Abs(_velocity);
+                Walk(_velocity);
+                transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+
+                if (Vector2.Distance(_startPosition, this.transform.position) <= 1f)
+                {
+                    UpdateWalkingPoints();
+                    _side = Side.right;
+                    _action = Action.walking;
+                }
+            }
+
+            if (this.transform.position.x > _startPosition.x)
+            {
+                _velocity = Mathf.Abs(_velocity) * -1;
+                Walk(_velocity);
+                transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x) * -1, transform.localScale.y, transform.localScale.z);
+
+                if (Vector2.Distance(_startPosition, this.transform.position) <= 1f)
+                {
+                    UpdateWalkingPoints();
+                    _side = Side.right;
+                    _action = Action.walking;
+                }
+            }
+        }
+    }
+
+    private void UpdateWalkingPoints()
+    {
+        _leftPoint = new Vector2(_startPosition.x - _distance, _startPosition.y);
+        _rightPoint = new Vector2(_startPosition.x + _distance, _startPosition.y);
+    }
+
+    #endregion
+
+    private void StopEnemyMovement()
+    {
+        _velocity = 0;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+
+        if (collision.CompareTag(StringUtils.Tags.Player))
+        {
+            _side = Side.idle;
+            _action = Action.combat;
+        }
     }
 
     #region Enemy Take Damage
@@ -222,6 +315,14 @@ public class Enemy : MonoBehaviour
     public void RestoreFullHP ()
     {
         _hp = _maxHP;
+    }
+    #endregion
+
+    #region Gizmos
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(_leftPoint, _rightPoint);
     }
     #endregion
 }

@@ -79,8 +79,6 @@ public class TutorialText : MonoBehaviour
         {
             _text.color = new Color(1,1,1,1);
         }
-
-        Debug.Log(_text.color.a);
         fadeIsComplete = true;
     }
 

@@ -68,7 +68,7 @@ GameObject:
   - component: {fileID: 8562087202183765341}
   - component: {fileID: 5436364687282501736}
   - component: {fileID: 2085089366171195588}
-  - component: {fileID: 7289561740971114101}
+  - component: {fileID: 7095073568740364776}
   m_Layer: 7
   m_Name: Golem
   m_TagString: Enemy
@@ -159,6 +159,8 @@ MonoBehaviour:
   _enemyScriptableObject: {fileID: 11400000, guid: f89b644ba15de9a44a4642c872cfc4f2, type: 2}
   _hp: 0
   _name: 3
+  _distanceOffSet: 0
+  _target: {fileID: 0}
 --- !u!61 &8562087202183765341
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -244,8 +246,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!61 &7289561740971114101
-BoxCollider2D:
+--- !u!58 &7095073568740364776
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -259,7 +261,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -277,18 +279,8 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_Radius: 0.5
 --- !u!1 &6534397232066791664
 GameObject:
   m_ObjectHideFlags: 0
@@ -303,8 +295,8 @@ GameObject:
   - component: {fileID: 8795539008032078010}
   - component: {fileID: 9023651351564014006}
   - component: {fileID: 127884367357399744}
-  - component: {fileID: 4295292839644270513}
   - component: {fileID: 4216081532426874258}
+  - component: {fileID: 4833305523152098736}
   m_Layer: 7
   m_Name: Slime
   m_TagString: Enemy
@@ -395,6 +387,8 @@ MonoBehaviour:
   _enemyScriptableObject: {fileID: 11400000, guid: fbb39277ed2067443993cb924f6b624a, type: 2}
   _hp: 0
   _name: 0
+  _distanceOffSet: 0
+  _target: {fileID: 0}
 --- !u!61 &8795539008032078010
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -402,7 +396,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6534397232066791664}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -480,51 +474,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!61 &4295292839644270513
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6534397232066791664}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.875, y: 0.6875}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
 --- !u!95 &4216081532426874258
 Animator:
   serializedVersion: 5
@@ -546,6 +495,41 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!58 &4833305523152098736
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6534397232066791664}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.4375
 --- !u!1 &7484308786379335171
 GameObject:
   m_ObjectHideFlags: 0
@@ -560,7 +544,7 @@ GameObject:
   - component: {fileID: 1410887267399726733}
   - component: {fileID: 3981931217522264603}
   - component: {fileID: 6060194811021616837}
-  - component: {fileID: 217677819513508878}
+  - component: {fileID: 4857172435650585149}
   m_Layer: 7
   m_Name: Gnome
   m_TagString: Enemy
@@ -651,6 +635,8 @@ MonoBehaviour:
   _enemyScriptableObject: {fileID: 11400000, guid: b708dfd60954b824c89a7d9427f1adc0, type: 2}
   _hp: 0
   _name: 1
+  _distanceOffSet: 0
+  _target: {fileID: 0}
 --- !u!61 &1410887267399726733
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -736,8 +722,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!61 &217677819513508878
-BoxCollider2D:
+--- !u!58 &4857172435650585149
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -751,7 +737,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -769,18 +755,8 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_Radius: 0.5
 --- !u!1 &8341260251224402199
 GameObject:
   m_ObjectHideFlags: 0
@@ -795,7 +771,7 @@ GameObject:
   - component: {fileID: 5467100581484334424}
   - component: {fileID: 9038113278859519106}
   - component: {fileID: 6202089855495984660}
-  - component: {fileID: 2634144755319347657}
+  - component: {fileID: 6827789396318123962}
   m_Layer: 7
   m_Name: Cyclope
   m_TagString: Enemy
@@ -886,6 +862,8 @@ MonoBehaviour:
   _enemyScriptableObject: {fileID: 11400000, guid: 8089894158aa1ac45b7628b9907f9d87, type: 2}
   _hp: 0
   _name: 2
+  _distanceOffSet: 0
+  _target: {fileID: 0}
 --- !u!61 &5467100581484334424
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -971,8 +949,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!61 &2634144755319347657
-BoxCollider2D:
+--- !u!58 &6827789396318123962
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -986,7 +964,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -1004,15 +982,5 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_Radius: 0.5
