@@ -354,6 +354,12 @@ public class player : MonoBehaviour
 
             if (collision.gameObject.CompareTag(StringUtils.Tags.Teleport) && collision.gameObject.layer == interactableLayerMask)
             {
+                Debug.Log("Initiating teleport");
+                collision.gameObject.GetComponent<TeleportPlayer>().SetPlayerInteraction(this.gameObject);
+            }
+
+            if (collision.gameObject.CompareTag(StringUtils.Tags.NPC) && collision.gameObject.layer == interactableLayerMask)
+            {
                 ChangeScene.Instance.LoadScene(StringUtils.SceneName.CombatWorld);
             }
         }
