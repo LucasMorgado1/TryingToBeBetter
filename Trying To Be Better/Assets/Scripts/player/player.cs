@@ -1,11 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Experimental.GlobalIllumination;
 using UnityEngine.InputSystem;
-using static UnityEditor.Experimental.GraphView.GraphView;
-
 
 public class player : MonoBehaviour
 {
@@ -117,6 +112,7 @@ public class player : MonoBehaviour
     public int SetLife { set => _currentHp = value; }
     public int GetTotalLife {  get => _maxHP; }
     public GroundChecker OnGround { get => groundCheck; }
+    public float SetGravityScale { set => rb.gravityScale = value; }
     #endregion
 
     #region Unity Methods
@@ -355,6 +351,7 @@ public class player : MonoBehaviour
             if (collision.gameObject.CompareTag(StringUtils.Tags.Teleport) && collision.gameObject.layer == interactableLayerMask)
             {
                 Debug.Log("Initiating teleport");
+                ChangeGravityScale(0);
                 collision.gameObject.GetComponent<TeleportPlayer>().SetPlayerInteraction(this.gameObject);
             }
 
@@ -395,4 +392,10 @@ public class player : MonoBehaviour
 
     #endregion
 
+    #region Physics
+    public void ChangeGravityScale (int x)
+    {
+        SetGravityScale = x;
+    }
+    #endregion
 }

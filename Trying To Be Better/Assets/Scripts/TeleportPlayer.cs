@@ -1,56 +1,60 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class TeleportPlayer : MonoBehaviour
 {
-    [SerializeField]
-    private Transform[] _teleportPoints = new Transform[5];
-    private Queue fila = new Queue();
-    private bool playerInteracted = false;
-    private GameObject _playerCharacter;
-    private float _speed = 0.1f;
-    Vector3 _pointA;
-    Vector3 _pointB;
+    #region Variables
+    [SerializeField] private Transform[] _teleportPoints = new Transform[5];
+    private int _nextPosIndex;
+    private Transform _nextPos;
+    [SerializeField] private float _teleportSpeed;
 
-    // Start is called before the first frame update
+    private bool _playerInteracted = false;
+    private GameObject _playerCharacter;
+    #endregion
+
+    #region Unity Methoids
     void Start()
     {
-        for (int i = 0; i < _teleportPoints.Length; i++)
-        {
-            PutOnQueue(_teleportPoints[i]);
-        }
-        _pointA = _teleportPoints[0].position;
-        _pointB = _teleportPoints[1].position;
+        _nextPos = _teleportPoints[0];
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        if (playerInteracted) { 
+        if (_playerInteracted)
+        {
             MovingPlayerThroughPoints();
         }
     }
+    #endregion
 
+    #region Moving the Player
     private void MovingPlayerThroughPoints ()
     {
-
-        _playerCharacter.transform.position = Vector3.MoveTowards(_pointA, _pointB, _speed * Time.deltaTime);
+        if (_playerCharacter.transform.position == _nextPos.position && _playerInteracted)
+        {
+            _nextPosIndex++;
+            if (_nextPosIndex >= _teleportPoints.Length)
+            {
+                _playerCharacter.transform.parent = null;
+                _playerInteracted = false;
+                _playerCharacter.GetComponent<player>().ChangeGravityScale(1);
+                return;
+            }
+            _nextPos = _teleportPoints[_nextPosIndex];
+        }
+        else
+        {
+            _playerCharacter.transform.position = Vector3.MoveTowards(_playerCharacter.transform.position, _nextPos.position, _teleportSpeed);
+        }
     }
+    #endregion
 
-    private void PutOnQueue(object obj)
-    {
-        fila.Enqueue(obj);
-    }
-
+    #region Getting the player
     public bool SetPlayerInteraction(GameObject obj) 
     {
         obj.transform.parent = this.transform;
         _playerCharacter = obj;
-        return playerInteracted = true;
+        return _playerInteracted = true;
     }
-
-
+    #endregion
 }

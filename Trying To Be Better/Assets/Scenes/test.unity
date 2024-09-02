@@ -614,7 +614,7 @@ Transform:
   m_GameObject: {fileID: 282839073}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -15.29, y: -4.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1975,7 +1975,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.22110188
+  m_Radius: 0.2211019
 --- !u!114 &769518931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2145,7 +2145,7 @@ Transform:
   m_GameObject: {fileID: 902413576}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.66, y: 0, z: 0}
+  m_LocalPosition: {x: -7.77, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2178,8 +2178,8 @@ Transform:
   m_GameObject: {fileID: 940147103}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -36.91, y: -0.74, z: 0}
-  m_LocalScale: {x: 1.5650203, y: 0.4652107, z: 1}
+  m_LocalPosition: {x: -56.73, y: -5.09, z: 0}
+  m_LocalScale: {x: 4.6395025, y: 0.78327525, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6621846}
@@ -2793,7 +2793,7 @@ Transform:
   m_GameObject: {fileID: 1279696416}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -22.27, y: 5.54, z: 0}
+  m_LocalPosition: {x: -27.39, y: -4.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2824,7 +2824,7 @@ Transform:
   m_GameObject: {fileID: 1300667654}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.78, y: 5.47, z: 0}
+  m_LocalPosition: {x: -7.78, y: 5.52, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5371,6 +5371,7 @@ GameObject:
   - component: {fileID: 2102319353}
   - component: {fileID: 2102319354}
   - component: {fileID: 2102319355}
+  - component: {fileID: 2102319356}
   m_Layer: 6
   m_Name: Teleport
   m_TagString: Teleport
@@ -5416,6 +5417,7 @@ MonoBehaviour:
   - {fileID: 1174699090}
   - {fileID: 282839074}
   - {fileID: 1279696417}
+  _teleportSpeed: 0.7
 --- !u!61 &2102319355
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5461,6 +5463,25 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 2, y: 3}
   m_EdgeRadius: 0
+--- !u!114 &2102319356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2102319351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ce4f3fc52577d47865fa5b7b4c6f51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _points:
+  - {fileID: 2102319353}
+  - {fileID: 902413577}
+  - {fileID: 1300667655}
+  - {fileID: 1174699090}
+  - {fileID: 282839074}
+  - {fileID: 1279696417}
 --- !u!1 &2137352816
 GameObject:
   m_ObjectHideFlags: 0

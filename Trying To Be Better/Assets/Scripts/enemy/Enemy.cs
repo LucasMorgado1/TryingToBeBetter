@@ -1,10 +1,5 @@
-using System;
 using System.Collections;
-using System.Linq;
-using TMPro;
-using UnityEditor;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Enemy : MonoBehaviour
 {
