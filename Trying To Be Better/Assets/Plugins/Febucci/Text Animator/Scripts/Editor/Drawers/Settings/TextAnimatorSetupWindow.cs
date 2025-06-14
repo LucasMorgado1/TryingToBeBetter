@@ -5,16 +5,19 @@ using UnityEngine;
 using System.Linq;
 using Febucci.UI.Actions;
 using Febucci.UI.Effects;
+using Febucci.UI.Styles;
 
 namespace Febucci.UI
 {
     public class TextAnimatorSetupWindow : EditorWindow
     {
-        const string currentVersion = "2.0.0";
+        const string currentVersion = "2.3.1";
         const string path_defaultInstallation = "Assets/Plugins/Febucci/Text Animator";
 
         TextAnimatorInstallationData installationData;
         bool settingsFileFound;
+
+        public const string url_discord = "https://discord.gg/j4pySDa5rU";
 
 
         /// <summary>
@@ -31,10 +34,10 @@ namespace Febucci.UI
         #region Menu Items
 
         const string menuParent = "Tools/Febucci/TextAnimator/";
-        
+
         [MenuItem(menuParent + "About Window", priority = 1)]
         internal static void Menu_ShowWindowAlways() => ShowWindow(false);
-        
+
         [MenuItem(menuParent + "Utils/Select Settings SO", priority = 11)]
         static void Menu_SelectSettingsScriptable()
         {
@@ -59,9 +62,12 @@ namespace Febucci.UI
 
         #region Window
 
+        static Version oldVersion;
+        bool shouldUpdate = false;
         static void ShowWindow(bool onlyOnUpdate)
         {
             // already installed
+            bool shouldUpdate = false;
             if (IsTextAnimatorInstalled(out var installationGUID))
             {
                 string installationPath = AssetDatabase.GUIDToAssetPath(installationGUID);
@@ -73,18 +79,20 @@ namespace Febucci.UI
                     return;
                 }
 
-                //--- Updates to new version ---
-                UpdateProject(installationData);
+                Version.TryParse(installationData.latestVersion, out oldVersion);
+                shouldUpdate = UpdateProject(installationData,  oldVersion, false);
             }
             else
             {
                 //--- First time import ---
                 //Does nothing, asking the user to install with one click
             }
-            
+
             //Initializes the asset for the first time
             var window = (TextAnimatorSetupWindow)GetWindow(typeof(TextAnimatorSetupWindow), true,
                 "Text Animator Setup", true);
+
+            window.shouldUpdate = shouldUpdate;
             window.maxSize = new Vector2(351, 485);
             window.minSize = window.maxSize;
             window.settingsFileFound = TextAnimatorSettings.Instance;
@@ -106,7 +114,7 @@ namespace Febucci.UI
                 {
                     EditorGUILayout.LabelField("Unable to install package, please try to reopen this window from the Tools->Febucci menu");
                     return;
-                } 
+                }
             }
 
             //--- HEADER ---
@@ -114,20 +122,47 @@ namespace Febucci.UI
             EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("Welcome!", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("Thank you for using Text Animator. Have fun bringing your projects to life!",
-                EditorStyles.wordWrappedLabel);
+
+            if (shouldUpdate)
+            {
+                //--- Updates to new version ---
+                using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
+                {
+                    EditorGUILayout.LabelField(
+                        "You have updated to a new version! Do you want us to set up the new things for you?", EditorStyles.wordWrappedLabel);
+                    GUI.backgroundColor = Color.green;
+                    if (GUILayout.Button("Yes"))
+                    {
+                        UpdateProject(installationData, oldVersion, true);
+                        EditorUtility.DisplayDialog("Text Animator", "Update has been completed. Have fun!", "Yay!");
+                        shouldUpdate = false;
+                    }
+
+                    GUI.backgroundColor = Color.white;
+                    if (GUILayout.Button("No"))
+                    {
+                        shouldUpdate = false;
+                    }
+                }
+            }
+            else
+            {
+                EditorGUILayout.LabelField(
+                    "Thank you for using Text Animator. Have fun bringing your projects to life!",
+                    EditorStyles.wordWrappedLabel);
+            }
 
             EditorGUILayout.Space();
 
             //--- VERSION STATUS ---
-            
+
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Version:", EditorStyles.boldLabel);
             EditorGUILayout.LabelField(installationData.latestVersion, EditorStyles.whiteMiniLabel);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
-            
+
             if (!settingsFileFound)
             {
                 FixSettingsFileNotFound();
@@ -139,39 +174,38 @@ namespace Febucci.UI
             EditorGUILayout.LabelField("Here are some useful resources.", EditorStyles.label);
 
             EditorGUILayout.BeginHorizontal();
-            const string baseUrl = "https://febucci.com/text-animator-unity/";
             if (GUILayout.Button("What's New"))
             {
-                Application.OpenURL($"{baseUrl}changelog/");
+                Application.OpenURL($"https://docs.febucci.com/text-animator-unity/other/changelog");
             }
-            
+
             if (GUILayout.Button("Documentation"))
             {
-                Application.OpenURL($"{baseUrl}docs/");
+                Application.OpenURL($"https://docs.febucci.com/text-animator-unity");
             }
 
             if (GUILayout.Button("Support"))
             {
-                Application.OpenURL($"{baseUrl}support/");
+                Application.OpenURL($"https://www.febucci.com/tools/support/");
             }
 
             EditorGUILayout.EndHorizontal();
 
-            
+
             //--Extras--
             EditorGUILayout.LabelField("Extras", EditorStyles.boldLabel);
 
             EditorGUILayout.LabelField("Would you like to be included in a future Text Animator showcase?",
                 EditorStyles.wordWrappedMiniLabel);
             if (GUILayout.Button("-> Submit your game/project"))
-                Application.OpenURL("https://www.febucci.com/text-animator-unity/showcase/");
-            
+                Application.OpenURL("https://www.febucci.com/tools/text-animator-unity/showcase");
+
             EditorGUILayout.Space(1);
             EditorGUILayout.LabelField("Please consider writing a review for the asset. It takes one minute but it really helps. Thanks!",
                 EditorStyles.wordWrappedMiniLabel);
             if (GUILayout.Button("♥ Review on the Asset Store"))
-                Application.OpenURL("https://assetstore.unity.com/packages/slug/158707");
-            
+                Application.OpenURL("https://assetstore.unity.com/packages/slug/254677");
+
 
             GUILayout.Space(5);
             EditorGUILayout.LabelField("Cheers! @febucci", EditorStyles.centeredGreyMiniLabel);
@@ -187,7 +221,7 @@ namespace Febucci.UI
             {
                 return AssetDatabase.LoadAssetAtPath<TextAnimatorInstallationData>(AssetDatabase.GUIDToAssetPath(installationGuid));
             }
-            
+
             var data = _CreateScriptableAssetAtPath<TextAnimatorInstallationData>(path_defaultInstallation + "/Data",
                 "InstallationData");
             data.latestVersion = currentVersion;
@@ -196,7 +230,7 @@ namespace Febucci.UI
 
             return data;
         }
-        
+
         static bool IsTextAnimatorInstalled(out string installationGUID)
         {
             string[] path = AssetDatabase.FindAssets($"t:{nameof(TextAnimatorInstallationData)}");
@@ -217,9 +251,9 @@ namespace Febucci.UI
             result = result.Substring(0, result.LastIndexOf('/'));
             return true;
         }
-        
+
         #endregion
-        
+
         /// <summary>
         /// Creates built-in effects databases and assigns it to the settings file as default.
         /// </summary>
@@ -236,16 +270,19 @@ namespace Febucci.UI
                 Debug.LogError("Something went wrong in locating TextAnimator's installation data.");
                 return;
             }
-            
+
             var settings = GetOrCreateSettings(installationFolder);
-            CreateDefaultDatabases(installationFolder, 
+            CreateDefaultDatabases(installationFolder,
                 out var beh,
                 out var app,
-                out var act);
-            AssignDatabasesToSettings(settings, beh, app, act);
+                out var act,
+                out var stylesheet);
+            AssignDatabasesToSettings(settings, beh, app, act, stylesheet);
         }
 
         #region Databases and Tags
+
+        const string fileName_stylesheet = "TextAnimator StyleSheet";
 
         /// <summary>
         /// Creates default effects and actions databases.
@@ -255,24 +292,27 @@ namespace Febucci.UI
         /// <param name="appearances"></param>
         /// <param name="actions"></param>
         /// <remarks>In case they already exist, they'll get overwritten.</remarks>
-        static void CreateDefaultDatabases(string installationFolder, out AnimationsDatabase behaviors, out AnimationsDatabase appearances, out ActionDatabase actions)
+        static void CreateDefaultDatabases(string installationFolder, out AnimationsDatabase behaviors, out AnimationsDatabase appearances, out ActionDatabase actions, out StyleSheetScriptable styleSheet)
         {
             string progressTitle = "Text Animator";
-            
+
             // --- DATABASES ---
-            EditorUtility.DisplayProgressBar(progressTitle, "Creating Behaviors Database", 1/4f);
+            EditorUtility.DisplayProgressBar(progressTitle, "Creating Behaviors Database", 1/5f);
             behaviors = _CreateDatabase<AnimationsDatabase, AnimationScriptableBase>(installationFolder, "Behaviors", "Behaviors Database", EffectCategory.Behaviors);
-           
-            EditorUtility.DisplayProgressBar(progressTitle, "Creating Appearances Database", 2/4f);
+
+            EditorUtility.DisplayProgressBar(progressTitle, "Creating Appearances Database", 2/5f);
             appearances = _CreateDatabase<AnimationsDatabase, AnimationScriptableBase>(installationFolder, "Appearances", "Appearances Database", EffectCategory.Appearances);
-            
-            EditorUtility.DisplayProgressBar(progressTitle, "Creating Actions Database", 3/4f);
+
+            EditorUtility.DisplayProgressBar(progressTitle, "Creating Actions Database", 3/5f);
             actions = _CreateDatabase<ActionDatabase, ActionScriptableBase>(installationFolder, "Actions", "Actions Database", EffectCategory.None);
+
+            EditorUtility.DisplayProgressBar(progressTitle, "Creating Default Style Sheet",4/5f);
+            styleSheet = CreateStyleSheet(installationFolder);
 
             AssetDatabase.SaveAssets();
             EditorUtility.ClearProgressBar();
         }
-        
+
         public static DatabaseType _CreateDatabase<DatabaseType, ElementType>(string installationFolder, string folderName, string fileName, EffectCategory category)
             where DatabaseType : Database<ElementType> where ElementType : ScriptableObject, ITagProvider
         {
@@ -294,7 +334,7 @@ namespace Febucci.UI
             return database;
         }
 
-        static bool TryCreatingDefaultTagScriptable(System.Type type, EffectCategory category,  out ScriptableObject result) 
+        static bool TryCreatingDefaultTagScriptable(System.Type type, EffectCategory category,  out ScriptableObject result)
         {
             var attribute = type.GetCustomAttributes(typeof(TagInfoAttribute), true).FirstOrDefault() as TagInfoAttribute;
             if (attribute == null)
@@ -326,10 +366,10 @@ namespace Febucci.UI
             //changes scriptable field based on default value attributes
             var defaultValueAttributes =
                 type.GetCustomAttributes(typeof(DefaultValueAttribute), true) as DefaultValueAttribute[];
-                    
+
             SerializedObject serializedSo = new SerializedObject(so);
             var tagID = serializedSo.FindProperty("tagID");
-                    
+
             if (defaultValueAttributes != null)
             {
                 foreach (var info in defaultValueAttributes)
@@ -344,14 +384,14 @@ namespace Febucci.UI
             return true;
         }
 
-        
+
         #endregion
 
-        
+
         #region Settings
 
         static void AssignDatabasesToSettings(TextAnimatorSettings settings, AnimationsDatabase behaviorsDatabase,
-            AnimationsDatabase appearanceDatabase, ActionDatabase actionsDatabase)
+            AnimationsDatabase appearanceDatabase, ActionDatabase actionsDatabase, StyleSheetScriptable stylesheet)
         {
             SerializedObject serialized = new SerializedObject(settings);
             serialized.FindProperty(nameof(settings.actions))
@@ -365,16 +405,18 @@ namespace Febucci.UI
                     .FindPropertyRelative(nameof(settings.appearances.defaultDatabase)).objectReferenceValue =
                 appearanceDatabase;
 
+            serialized.FindProperty(nameof(settings.defaultStyleSheet)).objectReferenceValue = stylesheet;
+
             serialized.ApplyModifiedProperties();
             serialized.Update();
         }
-        
-        
+
+
         static TextAnimatorSettings GetOrCreateSettings(string installationFolder)
         {
             if(TextAnimatorSettings.Instance)
                 return TextAnimatorSettings.Instance;
-                
+
             return _CreateScriptableAssetAtPath<TextAnimatorSettings>(installationFolder + "/Resources", TextAnimatorSettings.expectedName);
         }
 
@@ -397,7 +439,7 @@ namespace Febucci.UI
                 Debug.LogError("Something went wrong in locating TextAnimator's installation data.");
                 return;
             }
-            
+
             DatabaseType GetOrCreateDatabase<DatabaseType, ElementType>(string folderName, string fileName, EffectCategory category)
                 where DatabaseType : Database<ElementType> where ElementType : ScriptableObject, ITagProvider
             {
@@ -417,14 +459,39 @@ namespace Febucci.UI
                 return null;
             }
 
+            StyleSheetScriptable GetOrCreateStylesheet()
+            {
+                string databaseGuid = AssetDatabase.FindAssets($"t:{nameof(StyleSheetScriptable)}").FirstOrDefault();
+
+                if (!string.IsNullOrEmpty(databaseGuid))
+                {
+                    return AssetDatabase.LoadAssetAtPath<StyleSheetScriptable>(AssetDatabase.GUIDToAssetPath(databaseGuid));
+                }
+
+                // tries creating new database
+                if (TryGetInstallationFolder(out installationFolder))
+                {
+                    return CreateStyleSheet(installationFolder);
+                }
+
+                return null;
+            }
+
             var settings = GetOrCreateSettings(installationFolder);
             AssignDatabasesToSettings(settings,
                 GetOrCreateDatabase<AnimationsDatabase, AnimationScriptableBase>("Behaviors", "Behaviors Database", EffectCategory.Behaviors),
                 GetOrCreateDatabase<AnimationsDatabase, AnimationScriptableBase>("Appearances",
                     "Appearances Database", EffectCategory.Appearances),
-                GetOrCreateDatabase<ActionDatabase, ActionScriptableBase>("Actions", "Actions Database", EffectCategory.None));
+                GetOrCreateDatabase<ActionDatabase, ActionScriptableBase>("Actions", "Actions Database", EffectCategory.None),
+                GetOrCreateStylesheet());
         }
 
+        static StyleSheetScriptable CreateStyleSheet(string installationFolder)
+        {
+            var result = _CreateScriptableAssetAtPath<StyleSheetScriptable>(installationFolder + $"/Styles", fileName_stylesheet);
+            EditorUtility.SetDirty(result);
+            return result;
+        }
 
         #endregion
 
@@ -434,11 +501,33 @@ namespace Febucci.UI
         /// Checks for stuff and updates some project files if needed
         /// </summary>
         /// <param name="installationData"></param>
-        static void UpdateProject(TextAnimatorInstallationData installationData)
+        static bool UpdateProject(TextAnimatorInstallationData installationData, Version oldVersion, bool performUpdate)
         {
-            //TODO on new update
+            if (!TryGetInstallationFolder(out string installationFolder))
+            {
+                return false;
+            }
+
+            bool shouldUpdate = false;
+            if (!string.IsNullOrEmpty(installationData.latestVersion))
+            {
+                // 2.1.0 added Style Sheets
+                if (oldVersion < new Version(2, 1, 0))
+                {
+                    if (performUpdate && TextAnimatorSettings.Instance)
+                    {
+                        var styleSheet = CreateStyleSheet(installationFolder);
+                        TextAnimatorSettings.Instance.defaultStyleSheet = styleSheet;
+                        EditorUtility.SetDirty(TextAnimatorSettings.Instance);
+                    }
+
+                    shouldUpdate = true;
+                }
+            }
+
             installationData.latestVersion = currentVersion;
             EditorUtility.SetDirty(installationData);
+            return shouldUpdate;
         }
 
         #endregion

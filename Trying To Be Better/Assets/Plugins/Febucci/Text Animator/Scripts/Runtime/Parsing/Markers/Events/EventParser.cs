@@ -1,10 +1,12 @@
+using System.Text;
+
 namespace Febucci.UI.Core.Parsing
 {
-    public class EventParser : TagParserBase
+    public class EventParser : Febucci.TextUtils.Parsing.TagParserBase
     {
         const char eventSymbol = '?';
 
-        public EventParser(char openingBracket, char closingBracket, char closingTagSymbol) 
+        public EventParser(char openingBracket, char closingBracket, char closingTagSymbol)
             : base(openingBracket, closingBracket, closingTagSymbol){ }
 
         EventMarker[] _results;
@@ -17,12 +19,12 @@ namespace Febucci.UI.Core.Parsing
             _results = new EventMarker[0];
         }
 
-        public override bool TryProcessingTag(string textInsideBrackets, int tagLength, int realTextIndex, int internalOrder)
+        public override bool TryProcessingTag(string textInsideBrackets, int tagLength, ref int realTextIndex, StringBuilder finalTextBuilder, int internalOrder)
         {
             //If the first character is not the event symbol, skips
             if (textInsideBrackets[0] != eventSymbol)
                 return false;
-            
+
             //Creates a new event
             EventMarker textEvent;
 
@@ -34,7 +36,7 @@ namespace Febucci.UI.Core.Parsing
                 string parameters = textInsideBrackets.Substring(indexOfEquals + 1);
 
                 //TODO fast strip
-                textEvent = new EventMarker(eventName, realTextIndex, internalOrder, parameters.Replace(" ", "").Split(',')); 
+                textEvent = new EventMarker(eventName, realTextIndex, internalOrder, parameters.Replace(" ", "").Split(','));
             }
             else
             {
@@ -43,7 +45,6 @@ namespace Febucci.UI.Core.Parsing
 
             System.Array.Resize(ref _results, _results.Length + 1);
             _results[_results.Length - 1] = textEvent;
-
             return true;
         }
     }

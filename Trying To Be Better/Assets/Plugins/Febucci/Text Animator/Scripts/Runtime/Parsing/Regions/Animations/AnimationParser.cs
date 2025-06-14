@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Febucci.UI.Effects;
 
 namespace Febucci.UI.Core.Parsing
@@ -7,7 +8,7 @@ namespace Febucci.UI.Core.Parsing
     /// <summary>
     /// Rules how to parse a rich text tag that has an opening and ending
     /// </summary>
-    public class AnimationParser<T> : TagParserBase where T : AnimationScriptableBase
+    public class AnimationParser<T> : Febucci.TextUtils.Parsing.TagParserBase where T : AnimationScriptableBase
     {
         //--- DATABASE ---
         public Database<T> database;
@@ -44,11 +45,11 @@ namespace Febucci.UI.Core.Parsing
         }
 
 
-        public override bool TryProcessingTag(string textInsideBrackets, int tagLength, int realTextIndex, int internalOrder)
+        public override bool TryProcessingTag(string textInsideBrackets, int tagLength, ref int realTextIndex, StringBuilder finalTextBuilder, int internalOrder)
         {
             if (!database) return false;
-            
-            textInsideBrackets = textInsideBrackets.ToLower(); //animations are case insensitive
+
+            if(!database.IsCaseSensitive) textInsideBrackets = textInsideBrackets.ToLowerInvariant(); //animations are case insensitive
 
             //Makes sure the database is built
             database.BuildOnce();
@@ -83,7 +84,7 @@ namespace Febucci.UI.Core.Parsing
             //TODO tests for this
             if (middleSymbol != middleSymbolDefault)
             {
-                if(tempTagName[0] != middleSymbol) return false; 
+                if(tempTagName[0] != middleSymbol) return false;
                 tempTagName = tempTagName.Substring(1);
             }
 
@@ -108,7 +109,7 @@ namespace Febucci.UI.Core.Parsing
             Returns true nonetheless, since even if the tag might have not been processed correctly,
             it's still a Text Animator tag that shouldn't appear in the final text
             */
-            return true; 
+            return true;
         }
     }
 }

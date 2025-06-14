@@ -1,5 +1,6 @@
 ﻿using Febucci.UI.Core;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Febucci.UI
 {
@@ -16,15 +17,20 @@ namespace Febucci.UI
         [SerializeField, Attributes.CharsDisplayTime, Tooltip("Wait time for normal letters")] public float waitForNormalChars = .03f;
         [SerializeField, Attributes.CharsDisplayTime, Tooltip("Wait time for ! ? .")] public float waitLong = .6f;
         [SerializeField, Attributes.CharsDisplayTime, Tooltip("Wait time for ; : ) - ,")] public float waitMiddle = .2f;
-        [SerializeField, Tooltip("-True: only the last punctuaction on a sequence waits for its category time.\n-False: each punctuaction will wait, regardless if it's in a sequence or not")] bool avoidMultiplePunctuactionWait = false;
 
-        [SerializeField, Tooltip("True if you want the typewriter to wait for new line characters")] bool waitForNewLines = true;
+        [System.Obsolete("Typo, please use 'avoidMultiplePunctuationWait' instead.")]
+        public bool avoidMultiplePunctuactionWait => avoidMultiplePunctuationWait;
+        
+        [FormerlySerializedAs("avoidMultiplePunctuactionWait")]
+        [SerializeField, Tooltip("-True: only the last punctuation on a sequence waits for its category time.\n-False: each punctuation will wait, regardless if it's in a sequence or not")] public bool avoidMultiplePunctuationWait = false;
 
-        [SerializeField, Tooltip("True if you want the typewriter to wait for all characters, false if you want to skip waiting for the last one")] bool waitForLastCharacter = true;
+        [SerializeField, Tooltip("True if you want the typewriter to wait for new line characters")] public bool waitForNewLines = true;
 
-        [SerializeField, Tooltip("True if you want to use the same typewriter's wait times for the disappearance progression, false if you want to use a different wait time")] bool useTypewriterWaitForDisappearances = true;
+        [SerializeField, Tooltip("True if you want the typewriter to wait for all characters, false if you want to skip waiting for the last one")] public bool waitForLastCharacter = true;
+
+        [SerializeField, Tooltip("True if you want to use the same typewriter's wait times for the disappearance progression, false if you want to use a different wait time")] public bool useTypewriterWaitForDisappearances = true;
         [SerializeField, Attributes.CharsDisplayTime, Tooltip("Wait time for characters in the disappearance progression")] float disappearanceWaitTime = .015f;
-        [SerializeField, Attributes.MinValue(0.1f), Tooltip("How much faster/slower is the disappearance progression compared to the typewriter's typing speed")] float disappearanceSpeedMultiplier = 1;
+        [SerializeField, Attributes.MinValue(0.1f), Tooltip("How much faster/slower is the disappearance progression compared to the typewriter's typing speed")] public float disappearanceSpeedMultiplier = 1;
 
         protected override float GetWaitAppearanceTimeOf(int charIndex)
         {
@@ -35,14 +41,14 @@ namespace Febucci.UI
                 return 0;
 
             //avoids waiting for multiple times if there are puntuactions near each other
-            if (avoidMultiplePunctuactionWait && char.IsPunctuation(character))
+            if (avoidMultiplePunctuationWait && char.IsPunctuation(character)) //curr char is punctuation
             {
-                if(TextAnimator.maxVisibleCharacters>TextAnimator.CharactersCount)
+                //next char is punctuation too, so skips this one
+                if (charIndex < TextAnimator.CharactersCount - 1
+                    && char.IsPunctuation(TextAnimator.Characters[charIndex + 1].info
+                        .character))
                 {
-                    if (char.IsPunctuation(TextAnimator.Characters[TextAnimator.maxVisibleCharacters].info.character)) //next character is punctuation
-                    {
-                        return waitForNormalChars;
-                    }
+                    return waitForNormalChars;
                 }
             }
 
